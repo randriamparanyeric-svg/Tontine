@@ -1,0 +1,90 @@
+@model Tontine.Models.Groupe
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">🎯 @Model.Nom</h2>
+                    
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <p class="text-muted mb-0">@Model.Description</p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5>💰 Montant par Versement</h5>
+                                    <h2>@Model.MontantParVersement.ToString("N0")</h2>
+                                    <small>Ar</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5>👥 Membres</h5>
+                                    <h2>@Model.Membres.Count</h2>
+                                    <small>/ @Model.NombreMembresPrevu</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DEUX BOUTONS -->
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#adminModal">
+                            🔐 Accès Admin (Mot de passe)
+                        </button>
+                        <a asp-action="IdentifierMembre" asp-route-codePartage="@Model.CodePartage" class="btn btn-info btn-lg">
+                            👁️ Voir comme Membre
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ADMIN - DEMANDE MOT DE PASSE -->
+    <div class="modal fade" id="adminModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">🔐 Connexion Admin</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form asp-action="VerifierAdmin" asp-route-codePartage="@Model.CodePartage" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="motDePasse" class="form-label">🔑 Mot de Passe Admin</label>
+                            <input type="password" name="motDePasse" id="motDePasse" class="form-control" placeholder="Entrez votre mot de passe" required autofocus>
+                            @if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)
+                            {
+                                <span class="text-danger small">
+                                    @ViewData.ModelState["motDePasse"].Errors[0].ErrorMessage
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-success">✅ Se Connecter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AUTO-OUVRIR LA MODAL SI ERREUR -->
+@if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var modal = new bootstrap.Modal(document.getElementById('adminModal'));
+            modal.show();
+        });
+    </script>
+}

@@ -1,0 +1,71 @@
+@model Tontine.Models.Groupe
+
+<div class="container mt-5">
+    <h1 class="mb-4">📋 Créer une nouvelle Tontine</h1>
+
+    <form asp-action="Create" method="post" class="card p-4">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group mb-3">
+            <label asp-for="Nom" class="form-label">Nom de la Tontine</label>
+            <input asp-for="Nom" class="form-control" placeholder="Ex: Tontine Famille">
+            <span asp-validation-for="Nom" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Description" class="form-label">Description (optionnel)</label>
+            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Décrivez votre tontine..."></textarea>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="NomAdmin" class="form-label">Votre Nom (Admin/Trésorier)</label>
+                    <input asp-for="NomAdmin" class="form-control" placeholder="Votre nom">
+                    <span asp-validation-for="NomAdmin" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="TelephoneAdmin" class="form-label">Téléphone (optionnel)</label>
+                    <input asp-for="TelephoneAdmin" class="form-control" placeholder="+261...">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="MontantParVersement" class="form-label">💰 Montant par Versement (Ar)</label>
+                    <input asp-for="MontantParVersement" type="number" step="1000" class="form-control" placeholder="50000">
+                    <span asp-validation-for="MontantParVersement" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="NombreMembresPrevu" class="form-label">👥 Nombre de Membres</label>
+                    <input asp-for="NombreMembresPrevu" type="number" class="form-control" placeholder="10">
+                    <span asp-validation-for="NombreMembresPrevu" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="MotDePasseHash" class="form-label">🔐 Mot de Passe (pour protéger le groupe)</label>
+            <input asp-for="MotDePasseHash" type="password" class="form-control" placeholder="Entrez un mot de passe">
+            <small class="text-muted">Ce mot de passe sera partagé avec les membres</small>
+            <span asp-validation-for="MotDePasseHash" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">✅ Créer la Tontine</button>
+            <a asp-action="Index" class="btn btn-secondary">❌ Annuler</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

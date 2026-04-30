@@ -1,0 +1,52 @@
+@model Tontine.Models.Groupe
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow-lg">
+                <div class="card-body p-5">
+                    <h2 class="text-center text-danger mb-4">⚠️ Supprimer la Tontine</h2>
+                    
+                    <div class="alert alert-danger mb-4">
+                        <strong>🚨 ATTENTION !</strong>
+                        <p class="mb-2">Vous êtes sur le point de supprimer :</p>
+                        <ul class="mb-0">
+                            <li><strong>Tontine :</strong> @Model.Nom</li>
+                            <li><strong>Membres :</strong> @Model.Membres.Count</li>
+                            <li><strong>Versements :</strong> @Model.Versements.Count</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Cette action est irréversible !</strong>
+                        <p class="mb-0">Toutes les données (membres, versements, etc.) seront supprimées définitivement.</p>
+                    </div>
+
+                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group mb-3">
+                            <label for="motDePasse" class="form-label">🔑 Confirmer avec votre Mot de Passe</label>
+                            <input type="password" name="motDePasse" id="motDePasse" class="form-control" placeholder="Entrez votre mot de passe" required autofocus>
+                            @if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)
+                            {
+                                <span class="text-danger small">
+                                    @ViewData.ModelState["motDePasse"].Errors[0].ErrorMessage
+                                </span>
+                            }
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                🗑️ Supprimer Définitivement
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary btn-lg">
+                                ❌ Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

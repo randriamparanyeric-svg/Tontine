@@ -1,0 +1,208 @@
+@model Tontine.Models.Groupe
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>@Model.Nom</h1>
+            <p class="text-muted">🔐 Espace Admin</p>
+        </div>
+        <div class="d-flex gap-2">
+            <form asp-action="QuitterGroupe" asp-route-groupeId="@Model.Id" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-warning">🚪 Déconnexion</button>
+            </form>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                🗑️ Supprimer le Groupe
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Membres.Any())
+    {
+        <div class="alert alert-warning mb-4 shadow-sm">
+            <strong>⚠️ Attention :</strong> Vous n'avez aucun membre inscrit. 
+            <a asp-controller="Membres" asp-action="Create" asp-route-groupeId="@Model.Id" class="alert-link">Ajouter un membre maintenant</a>.
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-uppercase opacity-75">💰 Montant Unitaire</h6>
+                    <h2 class="mb-0">@Model.MontantParVersement.ToString("N0") <small>Ar</small></h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-uppercase opacity-75">👥 Membres</h6>
+                    <h2 class="mb-0">@Model.Membres.Count / @Model.NombreMembresPrevu</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-uppercase opacity-75">💵 Collecté</h6>
+                    <h2 class="mb-0">@Model.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-uppercase opacity-75">⏳ En Attente</h6>
+                    <h2 class="mb-0">@Model.Versements.Where(v => v.Statut == "En attente").Sum(v => v.Montant).ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mb-4 border-0 shadow-sm">
+        <h5 class="alert-heading">🔗 Lien de Partage</h5>
+        <p class="mb-2 text-dark">Partagez ce lien avec vos membres pour qu'ils puissent s'inscrire :</p>
+        <div class="input-group">
+            <input type="text" class="form-control" readonly id="shareLink" 
+                   value="@($"{Context.Request.Scheme}://{Context.Request.Host}/groupe/{Model.CodePartage}")">
+            <button class="btn btn-info text-white" onclick="copyLink()">📋 Copier le lien</button>
+        </div>
+    </div>
+
+    <div class="card mb-4 border-warning shadow-sm">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">⏳ Versements en attente de validation</h5>
+            <span class="badge bg-dark">@Model.Versements.Count(v => v.Statut == "En attente")</span>
+        </div>
+        <div class="card-body">
+            @{ var pending = Model.Versements.Where(v => v.Statut == "En attente").ToList(); }
+            @if (pending.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Membre</th>
+                                <th>Montant</th>
+                                <th>Date de soumission</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var v in pending.OrderByDescending(v => v.Date))
+                            {
+                                <tr>
+                                    <td><strong>@v.Membre?.Nom</strong></td>
+                                    <td><span class="text-success fw-bold">@v.Montant.ToString("N0") Ar</span></td>
+                                    <td>@v.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="text-end">
+                                        <form asp-action="Confirmer" asp-controller="Versements" asp-route-id="@v.Id" method="post" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-success">✅ Valider</button>
+                                        </form>
+                                        <form asp-action="Rejeter" asp-controller="Versements" asp-route-id="@v.Id" method="post" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Refuser ce versement ?')">❌ Rejeter</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">✨ Aucun versement en attente de confirmation.</p>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">👥 Liste des Membres</h5>
+            <a asp-controller="Membres" asp-action="Create" asp-route-groupeId="@Model.Id" class="btn btn-sm btn-light fw-bold">➕ Ajouter</a>
+        </div>
+        <div class="card-body">
+            @if (Model.Membres.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nom du membre</th>
+                                <th>Téléphone</th>
+                                <th class="text-center">Versements</th>
+                                <th>Total Cotisé</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var membre in Model.Membres)
+                            {
+                                <tr>
+                                    <td>@membre.Nom</td>
+                                    <td>@membre.Telephone</td>
+                                    <td class="text-center">@membre.Versements.Count</td>
+                                    <td class="fw-bold">@membre.Versements.Sum(v => v.Montant).ToString("N0") Ar</td>
+                                    <td>
+                                        <a asp-controller="Membres" asp-action="Edit" asp-route-id="@membre.Id" class="btn btn-sm btn-outline-warning">✏️</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">📜 Historique complet des transactions</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Versements.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Membre</th>
+                                <th>Montant</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var versement in Model.Versements.OrderByDescending(v => v.Date))
+                            {
+                                <tr>
+                                    <td>@versement.Membre?.Nom</td>
+                                    <td>@versement.Montant.ToString("N0") Ar</td>
+                                    <td>@versement.Date.ToString("dd/MM/yy HH:mm")</td>
+                                    <td>
+                                        @if (versement.Statut == "Confirmé") { <span class="badge bg-success">Confirmé</span> }
+                                        else if (versement.Statut == "En attente") { <span class="badge bg-warning text-dark">En attente</span> }
+                                        else { <span class="badge bg-danger">Rejeté</span> }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyLink() {
+        var copyText = document.getElementById("shareLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        alert("Lien copié !");
+    }
+</script>

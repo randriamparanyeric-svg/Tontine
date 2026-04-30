@@ -1,0 +1,46 @@
+@model Tontine.Models.Groupe
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">👤 Identification Membre</h2>
+                    
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <h5>@Model.Nom</h5>
+                        <p class="text-muted mb-0">@Model.Description</p>
+                    </div>
+
+                    <form asp-action="VerifierMembre" asp-route-codePartage="@Model.CodePartage" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group mb-3">
+                            <label for="telephone" class="form-label">📱 Votre Numéro de Téléphone</label>
+                            <input type="tel" name="telephone" id="telephone" class="form-control" placeholder="+261 34 12 34 567" required autofocus>
+                            @if (ViewData.ModelState["telephone"]?.Errors.Any() == true)
+                            {
+                                <span class="text-danger small">
+                                    @ViewData.ModelState["telephone"].Errors[0].ErrorMessage
+                                </span>
+                            }
+                            <small class="form-text text-muted">Entrez le numéro de téléphone avec lequel vous avez été inscrit</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">✅ Confirmer</button>
+                            <a asp-action="AccederMembre" asp-route-codePartage="@Model.CodePartage" class="btn btn-secondary">🔙 Retour</a>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="alert alert-info">
+                        <strong>💡 Besoin d'aide ?</strong>
+                        <p class="mb-0">Contactez l'admin : <strong>@Model.TelephoneAdmin</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

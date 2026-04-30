@@ -1,0 +1,60 @@
+@model IEnumerable<Tontine.Models.Versement>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>💵 Versements</h1>
+        <a asp-action="Create" class="btn btn-primary">➕ Ajouter Versement</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Membre</th>
+                                <th>Groupe</th>
+                                <th>Montant</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var versement in Model.OrderByDescending(v => v.Date))
+                            {
+                                <tr>
+                                    <td>@versement.Membre?.Nom</td>
+                                    <td>@versement.Groupe?.Nom</td>
+                                    <td><strong>@versement.Montant.ToString("N0")</strong> Ar</td>
+                                    <td>@versement.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (versement.Statut == "Confirmé")
+                                        {
+                                            <span class="badge bg-success">✅ @versement.Statut</span>
+                                        }
+                                        else if (versement.Statut == "En attente")
+                                        {
+                                            <span class="badge bg-warning">⏳ @versement.Statut</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">❌ @versement.Statut</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            Aucun versement pour le moment.
+        </div>
+    }
+</div>

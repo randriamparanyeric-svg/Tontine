@@ -1,0 +1,197 @@
+@model Tontine.Models.Groupe
+@using Tontine.Models
+
+@{
+    var membreActuel = ViewBag.MembreActuel as Membre;
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>@Model.Nom</h1>
+            <p class="text-muted">
+                👤 Bienvenue <strong>@membreActuel?.Nom</strong> 
+                <br>
+                <small>📱 @membreActuel?.Telephone</small>
+            </p>
+        </div>
+        <form asp-action="QuitterGroupe" asp-route-groupeId="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-danger">🚪 Quitter</button>
+        </form>
+    </div>
+
+    <!-- STATISTIQUES -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">💰 Montant</h5>
+                    <h2>@Model.MontantParVersement.ToString("N0")</h2>
+                    <small>Ar par versement</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">👥 Membres</h5>
+                    <h2>@Model.Membres.Count</h2>
+                    <small>/ @Model.NombreMembresPrevu</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">💵 Mon Total</h5>
+                    <h2>@membreActuel?.Versements.Sum(v => v.Montant).ToString("N0")</h2>
+                    <small>Ar versés</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">📊 Mes Versements</h5>
+                    <h2>@membreActuel?.Versements.Count</h2>
+                    <small>enregistrés</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPEL À ACTION -->
+    <div class="alert alert-success mb-4">
+        <h5>💰 Effectuer un Versement</h5>
+        <p>Cliquez sur le bouton pour enregistrer votre versement. L'admin le confirmera.</p>
+        <a asp-controller="Versements" asp-action="Create" asp-route-membreId="@membreActuel?.Id" class="btn btn-lg btn-success">
+            ➕ Verser Maintenant
+        </a>
+    </div>
+
+    <!-- TOUS LES MEMBRES -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">👥 Tous les Membres (@Model.Membres.Count)</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Membres.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Téléphone</th>
+                                <th>Versements</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var membre in Model.Membres)
+                            {
+                                <tr class="@(membre.Id == membreActuel?.Id ? "table-info" : "")">
+                                    <td>
+                                        @membre.Nom
+                                        @if (membre.Id == membreActuel?.Id)
+                                        {
+                                            <span class="badge bg-info">Vous</span>
+                                        }
+                                    </td>
+                                    <td>@membre.Telephone</td>
+                                    <td>@membre.Versements.Count</td>
+                                    <td>@membre.Versements.Sum(v => v.Montant).ToString("N0") Ar</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- MES VERSEMENTS EN ATTENTE -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">⏳ Mes Versements en Attente</h5>
+        </div>
+        <div class="card-body">
+            @{
+                var mesVersementsEnAttente = membreActuel?.Versements
+                    .Where(v => v.Statut == "En attente")
+                    .OrderByDescending(v => v.Date)
+                    .ToList();
+            }
+            @if (mesVersementsEnAttente?.Any() == true)
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Montant</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var versement in mesVersementsEnAttente)
+                            {
+                                <tr>
+                                    <td>@versement.Montant.ToString("N0") Ar</td>
+                                    <td>@versement.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td><span class="badge bg-warning">⏳ En attente</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Tous vos versements sont confirmés ! ✅</p>
+            }
+        </div>
+    </div>
+
+    <!-- MES VERSEMENTS CONFIRMÉS -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">✅ Mes Versements Confirmés</h5>
+        </div>
+        <div class="card-body">
+            @{
+                var mesVersementsConfirmes = membreActuel?.Versements
+                    .Where(v => v.Statut == "Confirmé")
+                    .OrderByDescending(v => v.Date)
+                    .ToList();
+            }
+            @if (mesVersementsConfirmes?.Any() == true)
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Montant</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var versement in mesVersementsConfirmes)
+                            {
+                                <tr>
+                                    <td>@versement.Montant.ToString("N0") Ar</td>
+                                    <td>@versement.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Aucun versement confirmé pour le moment.</p>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+@{
+    ViewData["Title"] = "Bienvenue - Tontine Smart";
+}
+
+<div class="container mt-5">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="display-4">🎯 Bienvenue sur <strong>Tontine Smart</strong></h1>
+            <p class="lead text-muted">Gérez facilement votre tontine en ligne</p>
+            
+            <div class="mt-4">
+                <a asp-controller="Groupes" asp-action="Index" class="btn btn-primary btn-lg me-2">
+                    📋 Mes Tontines
+                </a>
+                <a asp-controller="Groupes" asp-action="Create" class="btn btn-success btn-lg">
+                    ➕ Créer une Tontine
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6 text-center">
+            <div class="display-1">💰</div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 mb-3">🔐</div>
+                    <h5 class="card-title">Sécurisé</h5>
+                    <p class="card-text">Protégez vos tontines avec un mot de passe</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 mb-3">👥</div>
+                    <h5 class="card-title">Collaboratif</h5>
+                    <p class="card-text">Invitez facilement vos membres</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 mb-3">📊</div>
+                    <h5 class="card-title">Transparent</h5>
+                    <p class="card-text">Suivez tous les versements en temps réel</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

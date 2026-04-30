@@ -1,0 +1,24 @@
+@model IEnumerable<Tontine.Models.Membre>
+
+<div class="container">
+    <h1>Liste des Membres</h1>
+    <p><a asp-action="Create" class="btn btn-primary">Ajouter un Membre</a></p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Téléphone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>@item.Nom</td>
+                <td>@item.Telephone</td>
+                <td><a asp-action="Details" asp-route-id="@item.Id">Détails</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

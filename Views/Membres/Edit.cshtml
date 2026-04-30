@@ -1,0 +1,58 @@
+@model Tontine.Models.Membre
+
+<div class="container mt-5">
+    <h1 class="mb-4">✏️ Éditer le Membre</h1>
+
+    <form asp-action="Edit" method="post" class="card p-4">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group mb-3">
+            <label asp-for="Nom" class="form-label">Nom</label>
+            <input asp-for="Nom" class="form-control" placeholder="Nom du membre">
+            <span asp-validation-for="Nom" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Telephone" class="form-label">Téléphone</label>
+            <input asp-for="Telephone" class="form-control" placeholder="+261...">
+            <span asp-validation-for="Telephone" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Email" class="form-label">Email (optionnel)</label>
+            <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com">
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="GroupeId" class="form-label">Groupe</label>
+            <select asp-for="GroupeId" class="form-control" 
+                    asp-items="@(new SelectList(ViewBag.Groupes, "Id", "Nom"))">
+                <option value="">-- Sélectionner un groupe --</option>
+            </select>
+            <span asp-validation-for="GroupeId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <div class="form-check">
+                <input type="checkbox" asp-for="Actif" class="form-check-input">
+                <label class="form-check-label" asp-for="Actif">
+                    Membre Actif
+                </label>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">✅ Enregistrer</button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">❌ Annuler</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

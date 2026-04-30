@@ -1,0 +1,47 @@
+@model IEnumerable<Tontine.Models.Groupe>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📋 Mes Tontines</h1>
+        <a asp-action="Create" class="btn btn-primary">➕ Créer une Tontine</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var groupe in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@groupe.Nom</h5>
+                            <p class="card-text text-muted">@groupe.Description</p>
+
+                            <div class="mb-3">
+                                <p><strong>👤 Admin:</strong> @groupe.NomAdmin</p>
+                                <p><strong>💰 Montant:</strong> @groupe.MontantParVersement.ToString("N0") Ar</p>
+                                <p><strong>👥 Membres:</strong> @groupe.Membres.Count / @groupe.NombreMembresPrevu</p>
+                                <p><strong>📅 Créée:</strong> @groupe.DateCreation.ToString("dd/MM/yyyy")</p>
+                            </div>
+
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a asp-action="Details" asp-route-id="@groupe.Id" class="btn btn-sm btn-info">👁️ Détails</a>
+                                <a asp-action="AccederMembre" asp-route-codePartage="@groupe.CodePartage" class="btn btn-sm btn-success">🔓 Accéder</a>
+                            </div>
+
+                            <small class="text-muted d-block mt-2">
+                                🔗 Code: <code>@groupe.CodePartage</code>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            Vous n'avez pas encore de tontine. <a asp-action="Create">Créez-en une maintenant!</a>
+        </div>
+    }
+</div>

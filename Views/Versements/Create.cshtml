@@ -1,0 +1,54 @@
+@model Tontine.Models.Versement
+@using Tontine.Models
+
+@{
+    var membreActuel = ViewBag.MembreActuel as Membre;
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>💵 Ajouter un Versement</h1>
+        <a asp-action="Index" asp-controller="Groupes" class="btn btn-secondary">🔙 Retour</a>
+    </div>
+
+    <form asp-action="Create" method="post" class="card p-4">
+        @Html.AntiForgeryToken()
+
+        <div class="alert alert-info">
+            <strong>👤 Membre:</strong> @Model.Membre?.Nom<br>
+            <strong>👥 Groupe:</strong> @Model.Membre?.Groupe?.Nom<br>
+            <strong>💰 Montant Standard:</strong> @Model.Membre?.Groupe?.MontantParVersement.ToString("N0") Ar
+        </div>
+
+        <input type="hidden" asp-for="MembreId" />
+        <input type="hidden" asp-for="GroupeId" />
+
+        <div class="form-group mb-3">
+            <label asp-for="Montant" class="form-label">💰 Montant (Ar)</label>
+            <input asp-for="Montant" type="number" step="1000" class="form-control" placeholder="Montant du versement">
+            <span asp-validation-for="Montant" class="text-danger"></span>
+            <small class="form-text text-muted">Montant recommandé : @Model.Membre?.Groupe?.MontantParVersement.ToString("N0") Ar</small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Date" class="form-label">📅 Date</label>
+            <input asp-for="Date" type="datetime-local" class="form-control">
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>
+
+        <div class="alert alert-warning">
+            <small>⏳ <strong>Note:</strong> Votre versement sera en attente de confirmation par l'admin.</small>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success btn-lg">✅ Enregistrer Versement</button>
+            <a asp-action="VoirCommeMembe" asp-controller="Groupes" asp-route-codePartage="@Model.Groupe?.CodePartage" class="btn btn-secondary btn-lg">❌ Annuler</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
