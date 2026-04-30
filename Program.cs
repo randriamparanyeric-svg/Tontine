@@ -11,7 +11,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // 🔐 Services de sécurité
 builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
 builder.Services.AddScoped<IShareCodeService, ShareCodeService>();
-builder.Services.AddScoped<ISmsService, SmsService>();
 
 // Session & MVC
 builder.Services.AddDistributedMemoryCache();
@@ -23,8 +22,7 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddHttpClient<SmsService>();
-builder.Services.AddHttpClient<ISmsService, SmsService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 var app = builder.Build();
 
 // Migration automatique
