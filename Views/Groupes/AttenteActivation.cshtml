@@ -1,0 +1,64 @@
+@model Tontine.Models.Groupe
+
+@{
+    ViewData["Title"] = "Attente d'activation";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-lg border-0" style="border-radius: 15px;">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-hourglass-split text-warning" style="font-size: 4rem;"></i>
+                    </div>
+
+                    <h2 class="fw-bold text-dark">Demande transmise !</h2>
+                    <p class="text-muted fs-5">
+                        Félicitations, votre tontine <strong>"@Model.Nom"</strong> a été créée avec succès.
+                    </p>
+
+                    <hr class="my-4">
+
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <h5 class="alert-heading"><i class="bi bi-info-circle-fill"></i> Statut : En attente de validation</h5>
+                        <p class="mb-0">
+                            Pour garantir la sécurité et le support technique de votre carnet de registre, 
+                            votre espace doit être activé manuellement par le développeur.
+                        </p>
+                    </div>
+
+                    <div class="mt-4 text-start">
+                        <h6 class="fw-bold"><i class="bi bi-credit-card-2-back"></i> Comment activer votre espace ?</h6>
+                        <ol class="list-group list-group-numbered list-group-flush">
+                            <li class="list-group-item">Effectuez le règlement des frais de mise en service (ou abonnement).</li>
+                            <li class="list-group-item">
+                                Envoyez la référence du paiement ou contactez le développeur :
+                                <div class="mt-2 p-2 bg-light rounded border text-center">
+                                    <strong><i class="bi bi-whatsapp"></i> +261 32 64 572 08</strong><br/>
+                                    <strong class="small"><i class="bi bi-facebook"></i> Eric Gr</strong><br/>       
+                                    <strong><i class="bi bi-phone-fill"></i> +261 34 64 474 61 (M-Vola : Makalahiarison)</strong>
+                                </div>
+                            </li>
+                            <li class="list-group-item">Dès réception, votre accès sera débloqué en moins de 24h.</li>
+                        </ol>
+                    </div>
+
+                    <div class="mt-5">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                            <i class="bi bi-house-door"></i> Retour à l'accueil
+                        </a>
+                        <button onclick="window.location.reload();" class="btn btn-primary px-4 shadow">
+                            <i class="bi bi-arrow-clockwise"></i> Vérifier l'activation
+                        </button>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center py-3">
+                    <small class="text-muted">ID de votre tontine : <strong>#@Model.Id</strong> (à rappeler lors du paiement)</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">

@@ -58,8 +58,13 @@
                     @Html.AntiForgeryToken()
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="motDePasse" class="form-label">🔑 Mot de Passe Admin</label>
+                            <label for="motDePasse" class="form-label fw-bold">🔑 Mot de Passe Admin</label>
                             <input type="password" name="motDePasse" id="motDePasse" class="form-control" placeholder="Entrez votre mot de passe" required autofocus>
+                            
+                            <div class="text-end mt-2">
+                                <a asp-action="ForgotPassword" class="text-muted small">Mot de passe oublié ?</a>
+                            </div>
+
                             @if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)
                             {
                                 <span class="text-danger small">
@@ -76,7 +81,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <!-- AUTO-OUVRIR LA MODAL SI ERREUR -->
 @if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)

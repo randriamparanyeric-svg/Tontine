@@ -89,7 +89,7 @@
     <div class="card">
         <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">💵 Historique des Versements (@Model.Versements.Count)</h5>
-            <a asp-controller="Versements" asp-action="Create" asp-route-membreId="@Model.Id" class="btn btn-sm btn-light">➕ Ajouter Versement</a>
+        
         </div>
         <div class="card-body">
             @if (Model.Versements.Any())

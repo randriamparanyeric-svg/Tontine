@@ -19,13 +19,38 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Groupes" asp-action="Index">📋 Tontines</a>
-                    </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Membres" asp-action="Index">👥 Membres</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Versements" asp-action="Index">💵 Versements</a>
-                    </li>
+    <li class="nav-item ms-lg-3">
+    <a class="nav-link" asp-area="" asp-controller="AdminDev" asp-action="Index" 
+       style="
+        background: linear-gradient(45deg, #dc3545, #a51d2d);
+        color: white !important;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        /* --- CHANGEMENT DU CURSEUR ICI --- */
+        cursor: pointer; 
+        text-decoration: none;
+       ">
+        <i class="bi bi-cpu-fill"></i> 
+        <span>ESPACE DEV</span>
+    </a>
+</li>
+
+<style>
+    /* Effet au survol pour confirmer l'interactivité */
+    .nav-link:hover {
+        filter: brightness(1.2);
+        transform: scale(1.02);
+        cursor: pointer !important; /* Force le curseur 'main' */
+    }
+</style>
                 </ul>
             </div>
         </div>

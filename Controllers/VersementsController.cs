@@ -2,33 +2,34 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Tontine.Data;
 using Tontine.Models;
-using Tontine.Services; // Ajout indispensable pour reconnaître ISmsService
+using Tontine.Services;
 
 namespace Tontine.Controllers
-{ 
+{
     public class VersementsController : Controller
     {
         private readonly ApplicationDbContext _context;
-       private readonly IEmailService _emailService; // Changement ici
+        private readonly IEmailService _emailService;
+        private readonly ILogger<VersementsController> _logger;
 
-    public VersementsController(ApplicationDbContext context, IEmailService emailService)
-    {
-        _context = context;
-        _emailService = emailService;
-    }
+        public VersementsController(ApplicationDbContext context, IEmailService emailService, ILogger<VersementsController> logger)
+        {
+            _context = context;
+            _emailService = emailService;
+            _logger = logger;
+        }
 
-        // 📋 Liste des versements
+        // 📋 LISTE DES VERSEMENTS
         public async Task<IActionResult> Index()
         {
             var versements = await _context.Versements
                 .Include(v => v.Membre)
                 .Include(v => v.Groupe)
                 .ToListAsync();
-
             return View(versements);
         }
 
-        // ➕ Ajouter versement (MEMBRE)
+        // ➕ FORMULAIRE DE VERSEMENT (Côté Membre)
         public async Task<IActionResult> Create(int membreId)
         {
             var membre = await _context.Membres
@@ -50,7 +51,7 @@ namespace Tontine.Controllers
             return View(versement);
         }
 
-        // ➕ Enregistrement du versement (MEMBRE)
+        // ➕ ENREGISTREMENT DU VERSEMENT (Côté Membre)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Versement versement)
@@ -63,52 +64,37 @@ namespace Tontine.Controllers
                 _context.Add(versement);
                 await _context.SaveChangesAsync();
 
-                var groupe = await _context.Groupes.FindAsync(versement.GroupeId);
-                
-                // --- ENVOI SMS ---
                 var membre = await _context.Membres.FindAsync(versement.MembreId);
-        if (membre != null && !string.IsNullOrEmpty(membre.Email))
-        {
-           // 1. Définition du sujet
-string sujet = "📩 Réception de versement - Tontine";
+                var groupe = await _context.Groupes.FindAsync(versement.GroupeId);
 
-// 2. Construction d'un corps d'email structuré et élégant
-string corps = $@"
-    <div style='font-family: sans-serif; line-height: 1.6; color: #333;'>
-        <h2 style='color: #2c3e50;'>Bonjour {membre.Nom},</h2>
-        
-        <p>Nous vous informons que votre versement a bien été reçu par notre système :</p>
-        
-        <div style='background-color: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 5px solid #007bff;'>
-            <p style='margin: 0;'><b>Montant versé :</b> {versement.Montant} Ar</p>
-            <p style='margin: 0;'><b>Statut :</b> <span style='color: #e67e22;'>En attente de validation</span></p>
-        </div>
-        
-        <p>Votre nouveau solde est désormais de : <b>{membre.Solde} Ar</b>.</p>
-        
-        <p>Une notification finale vous sera envoyée dès que l'administrateur aura validé la transaction.</p>
-        
-        <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
-        <p style='font-size: 0.9em; color: #7f8c8d;'><i>Ceci est un message automatique de votre système de gestion de Tontine.</i></p>
-    </div>";
+                // MESSAGE DE CONFIRMATION SUR L'INTERFACE
+                TempData["SuccessMessage"] = "✅ Votre versement a été envoyé pour validation.";
 
-// 3. Envoi de l'email
-await _emailService.EnvoyerEmailAsync(membre.Email, sujet, corps);
-        }
-                // -----------------
+                // EMAIL : ACCUSÉ DE RÉCEPTION
+                if (membre != null && !string.IsNullOrWhiteSpace(membre.Email))
+                {
+                    try 
+                    {
+                        string sujet = "📩 Réception de versement - Tontine";
+                        string corps = $@"
+                            <div style='font-family: sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px;'>
+                                <h2 style='color: #2c3e50;'>Bonjour {membre.Nom},</h2>
+                                <p>Nous avons bien reçu votre déclaration de versement de <strong>{versement.Montant} Ar</strong>.</p>
+                                <p>L'administrateur du groupe va maintenant vérifier la transaction. Vous recevrez une confirmation dès que votre solde sera mis à jour.</p>
+                                <p style='color: #888; font-size: 12px;'>Ceci est un message automatique.</p>
+                            </div>";
+
+                        await _emailService.EnvoyerEmailAsync(membre.Email, sujet, corps);
+                    }
+                    catch (Exception ex) { _logger.LogError(ex, "Erreur email Create"); }
+                }
 
                 return RedirectToAction("VoirCommeMembe", "Groupes", new { codePartage = groupe?.CodePartage });
             }
-
-            var membreData = await _context.Membres
-                .Include(m => m.Groupe)
-                .FirstOrDefaultAsync(m => m.Id == versement.MembreId);
-
-            versement.Membre = membreData;
             return View(versement);
         }
 
-        // ✅ Confirmer versement (ADMIN ONLY)
+        // ✅ CONFIRMER VERSEMENT (Côté Admin)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Confirmer(int id)
@@ -120,79 +106,89 @@ await _emailService.EnvoyerEmailAsync(membre.Email, sujet, corps);
 
             if (versement == null) return NotFound();
 
-            var isAdmin = HttpContext.Session.GetString($"admin_groupe_{versement.Groupe.Id}") == "true";
-            if (!isAdmin)
-                return Unauthorized("Seul l'admin peut confirmer les versements");
+            // Vérification de la session Admin
+            var isAdmin = HttpContext.Session.GetString($"admin_groupe_{versement.GroupeId}") == "true";
+            if (!isAdmin) return Unauthorized();
 
             versement.Statut = "Confirmé";
-
             var membre = versement.Membre;
+
             if (membre != null)
             {
                 membre.Solde += versement.Montant;
                 _context.Update(membre);
-                
-               // 1. Définition du sujet (plus affirmatif)
-string sujet = "✅ Versement validé avec succès !";
 
-// 2. Construction du corps d'email "Style Succès"
-string corps = $@"
-    <div style='font-family: sans-serif; line-height: 1.6; color: #333;'>
-        <div style='text-align: center; margin-bottom: 20px;'>
-            <h1 style='color: #27ae60;'>Félicitations !</h1>
-        </div>
+                // MESSAGE DE CONFIRMATION ADMIN
+                TempData["SuccessMessage"] = $"✅ Versement de {membre.Nom} validé (+{versement.Montant} Ar).";
 
-        <h2 style='color: #2c3e50;'>Bonjour {membre.Nom},</h2>
-        
-        <p>Bonne nouvelle ! Votre versement a été <b>officiellement validé</b> par l'administrateur de la tontine.</p>
-        
-        <div style='background-color: #f0fff4; padding: 20px; border-radius: 8px; border-left: 5px solid #27ae60; margin: 20px 0;'>
-            <p style='margin: 0; font-size: 1.1em;'><strong>Montant confirmé :</strong> {versement.Montant} Ar</p>
-            <p style='margin: 0; font-size: 1.1em;'><strong>Nouveau Solde :</strong> {membre.Solde} Ar</p>
-        </div>
-        
-        <p>Votre participation est bien à jour. Vous pouvez consulter votre historique complet sur votre espace membre.</p>
-        
-        <div style='text-align: center; margin-top: 30px;'>
-            <p style='color: #7f8c8d;'>Merci d'être un membre actif de notre communauté !</p>
-        </div>
+                // EMAIL : CONFIRMATION FINALE
+                if (!string.IsNullOrWhiteSpace(membre.Email))
+                {
+                    try 
+                    {
+                        string sujet = "✅ Votre versement a été validé !";
+                        string corps = $@"
+                            <div style='font-family: sans-serif; border-left: 5px solid #27ae60; padding: 20px; background-color: #f0fff4;'>
+                                <h2 style='color: #27ae60;'>Félicitations {membre.Nom} !</h2>
+                                <p>Votre versement de <strong>{versement.Montant} Ar</strong> est désormais confirmé.</p>
+                                <p><strong>Nouveau Solde :</strong> {membre.Solde} Ar</p>
+                                <p>Merci pour votre confiance !</p>
+                            </div>";
 
-        <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
-        <p style='font-size: 0.8em; color: #95a5a6; text-align: center;'>
-            Ceci est une notification automatique de <b>Gestion Tontine v2.0</b>
-        </p>
-    </div>";
-
-// 3. Envoi de l'email
-await _emailService.EnvoyerEmailAsync(membre.Email, sujet, corps);
+                        await _emailService.EnvoyerEmailAsync(membre.Email, sujet, corps);
+                    }
+                    catch (Exception ex) { _logger.LogError(ex, "Erreur email Confirmer"); }
+                }
             }
 
             _context.Update(versement);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Details", "Groupes", new { id = versement.Groupe.Id });
+            return RedirectToAction("Details", "Groupes", new { id = versement.GroupeId });
         }
 
-        // ❌ Rejeter versement (ADMIN ONLY)
+        // ❌ REJETER VERSEMENT (Côté Admin)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Rejeter(int id)
         {
             var versement = await _context.Versements
+                .Include(v => v.Membre)
                 .Include(v => v.Groupe)
                 .FirstOrDefaultAsync(v => v.Id == id);
 
             if (versement == null) return NotFound();
 
-            var isAdmin = HttpContext.Session.GetString($"admin_groupe_{versement.Groupe.Id}") == "true";
-            if (!isAdmin)
-                return Unauthorized("Seul l'admin peut rejeter les versements");
+            var isAdmin = HttpContext.Session.GetString($"admin_groupe_{versement.GroupeId}") == "true";
+            if (!isAdmin) return Unauthorized();
 
             versement.Statut = "Rejeté";
+
+            // MESSAGE INFO ADMIN
+            TempData["ErrorMessage"] = $"⚠️ Le versement de {versement.Membre?.Nom} a été rejeté.";
+
+            // EMAIL : NOTIFICATION DE REJET
+            if (versement.Membre != null && !string.IsNullOrWhiteSpace(versement.Membre.Email))
+            {
+                try
+                {
+                    string sujet = "❌ Information sur votre versement";
+                    string corps = $@"
+                        <div style='font-family: sans-serif; border: 1px solid #dc3545; padding: 20px;'>
+                            <h2 style='color: #dc3545;'>Bonjour {versement.Membre.Nom},</h2>
+                            <p>Votre versement de <strong>{versement.Montant} Ar</strong> a été rejeté par l'administrateur.</p>
+                            <p>Veuillez vérifier les informations transmises ou contacter l'administrateur de votre groupe.</p>
+                        </div>";
+
+                    await _emailService.EnvoyerEmailAsync(versement.Membre.Email, sujet, corps);
+                }
+                catch (Exception ex) { _logger.LogError(ex, "Erreur email Rejeter"); }
+            }
+
             _context.Update(versement);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Details", "Groupes", new { id = versement.Groupe.Id });
+            return RedirectToAction("Details", "Groupes", new { id = versement.GroupeId });
         }
     }
 }

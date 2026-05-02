@@ -13,12 +13,19 @@ namespace Tontine.Models
         [StringLength(500)]
         public string? Description { get; set; }
 
-        // 🔐 Sécurité - Mot de passe HASHÉ
+        // --- AUTHENTIFICATION ---
+
+        [Required(ErrorMessage = "L'email de l'admin est requis")]
+        [EmailAddress(ErrorMessage = "Format d'email invalide")]
+        [StringLength(255)]
+        public string AdminEmail { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Le mot de passe est requis")]
         [StringLength(255)]
         public string MotDePasseHash { get; set; } = string.Empty;
 
-        // 👤 Admin/Trésorier
+        // --- ADMIN / TRÉSORIER ---
+
         [Required(ErrorMessage = "Le nom de l'admin est requis")]
         [StringLength(100)]
         public string NomAdmin { get; set; } = string.Empty;
@@ -26,11 +33,22 @@ namespace Tontine.Models
         [StringLength(20)]
         public string? TelephoneAdmin { get; set; }
 
-        // 🔗 Lien de partage unique
+        // --- VERROU DÉVELOPPEUR (VOTRE POUVOIR) ---
+
+        // On renomme 'Actif' en 'EstValideParDev' pour plus de clarté
+        // Par défaut c'est FALSE : le carnet est bloqué à la création
+        public bool EstValideParDev { get; set; } = false; 
+
+        // --- SÉCURITÉ / RÉCUPÉRATION ---
+
+        public string? ResetToken { get; set; }
+        public DateTime? ResetTokenExpiry { get; set; }
+
+        // --- CONFIGURATION TONTINE ---
+
         [StringLength(50)]
         public string CodePartage { get; set; } = string.Empty;
 
-        // 💰 Tontine spécifique
         [Required(ErrorMessage = "Le montant par versement est requis")]
         [Range(0.01, double.MaxValue)]
         public decimal MontantParVersement { get; set; }
@@ -39,11 +57,10 @@ namespace Tontine.Models
         [Range(1, 1000)]
         public int NombreMembresPrevu { get; set; }
 
-        // 📅 Statut
-        public DateTime DateCreation { get; set; } = DateTime.Now;
-        public bool Actif { get; set; } = true;
+        // --- STATUT ET RELATIONS ---
 
-        // Relations
+        public DateTime DateCreation { get; set; } = DateTime.Now;
+        
         public List<Membre> Membres { get; set; } = new();
         public List<Versement> Versements { get; set; } = new();
     }

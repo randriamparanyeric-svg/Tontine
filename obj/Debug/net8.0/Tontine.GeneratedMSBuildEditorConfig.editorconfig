@@ -18,8 +18,20 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\HP\Tontine
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/HP/Tontine/Views/AdminDev/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5EZXZcRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/Tontine/Views/AdminDev/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5EZXZcTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/HP/Tontine/Views/Groupes/AccederMembre.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JvdXBlc1xBY2NlZGVyTWVtYnJlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/Tontine/Views/Groupes/AttenteActivation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JvdXBlc1xBdHRlbnRlQWN0aXZhdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/HP/Tontine/Views/Groupes/Create.cshtml]
@@ -34,6 +46,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JvdXBlc1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/HP/Tontine/Views/Groupes/ForgotPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JvdXBlc1xGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/HP/Tontine/Views/Groupes/IdentifierMembre.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JvdXBlc1xJZGVudGlmaWVyTWVtYnJlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -44,6 +60,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/HP/Tontine/Views/Groupes/MemberSpace.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JvdXBlc1xNZW1iZXJTcGFjZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/HP/Tontine/Views/Groupes/ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JvdXBlc1xSZXNldFBhc3N3b3JkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/HP/Tontine/Views/Groupes/Views_Groupes_Details_Version5.cshtml]

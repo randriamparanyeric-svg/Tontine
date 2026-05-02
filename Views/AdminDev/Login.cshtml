@@ -1,0 +1,32 @@
+@{
+    Layout = "_Layout"; 
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-dark text-white text-center">
+                    <h4 class="mb-0">🔐 Accès Développeur</h4>
+                </div>
+                <div class="card-body p-4">
+                    @if (ViewBag.Error != null) {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+                    <form asp-action="Login" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label">Utilisateur</label>
+                            <input type="text" name="username" class="form-control" required autofocus />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mot de passe</label>
+                            <input type="password" name="password" class="form-control" required />
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100">Entrer dans la console</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

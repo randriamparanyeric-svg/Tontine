@@ -1,0 +1,89 @@
+@model IEnumerable<Tontine.Models.Groupe>
+
+@{
+    ViewData["Title"] = "Console Développeur";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-3">
+        <h2 class="mb-0">🛠 Gestionnaire Développeur</h2>
+        <div class="d-flex gap-2">
+            <span class="badge bg-info text-dark d-flex align-items-center">Total : @Model.Count() tontines</span>
+            <a asp-action="Logout" class="btn btn-outline-danger btn-sm">Déconnexion</a>
+        </div>
+    </div>
+
+    <div class="table-responsive mt-4">
+        <table class="table table-hover align-middle shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Nom de la Tontine</th>
+                    <th>Administrateur</th>
+                    <th class="text-center">Membres</th>
+                    <th class="text-center">Statut</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.DateCreation.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="fw-bold text-primary">@item.Nom</span>
+                        </td>
+                        <td>
+                            <div>@item.NomAdmin</div>
+                            <small class="text-muted">@item.AdminEmail</small>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill bg-secondary">@item.NombreMembresPrevu</span>
+                        </td>
+                        <td class="text-center">
+                            @if (item.EstValideParDev)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Activée
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-clock"></i> En attente
+                                </span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <form asp-action="ToggleValidation" asp-route-id="@item.Id" method="post">
+                                @Html.AntiForgeryToken()
+                                
+                                @if (!item.EstValideParDev)
+                                {
+                                    <button type="submit" class="btn btn-sm btn-success px-3">
+                                        Valider l'accès
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                            onclick="return confirm('Voulez-vous vraiment suspendre l\'accès de ce groupe ?')">
+                                        Suspendre
+                                    </button>
+                                }
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            Aucune tontine enregistrée pour le moment.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
