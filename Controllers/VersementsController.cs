@@ -30,70 +30,101 @@ namespace Tontine.Controllers
         }
 
         // ➕ FORMULAIRE DE VERSEMENT (Côté Membre)
-        public async Task<IActionResult> Create(int membreId)
-        {
-            var membre = await _context.Membres
-                .Include(m => m.Groupe)
-                .FirstOrDefaultAsync(m => m.Id == membreId);
+       // GET: Versements/Create
+public async Task<IActionResult> Create(int membreId)
+{
+    // On inclut impérativement le Groupe pour éviter les erreurs NullReference dans la vue
+    var membre = await _context.Membres
+        .Include(m => m.Groupe) 
+        .FirstOrDefaultAsync(m => m.Id == membreId);
 
-            if (membre == null) return NotFound();
+    if (membre == null) return NotFound();
 
-            var versement = new Versement
-            {
-                MembreId = membreId,
-                Montant = membre.Groupe?.MontantParVersement ?? 0,
-                GroupeId = membre.GroupeId,
-                Date = DateTime.Now,
-                Statut = "En attente",
-                Membre = membre
-            };
+    var versement = new Versement
+    {
+        MembreId = membreId,
+        GroupeId = membre.GroupeId,
+        Montant = membre.Groupe?.MontantParVersement ?? 0,
+        Date = DateTime.Now,
+        Statut = "En attente",
+        Membre = membre // Nécessaire pour l'affichage initial des infos du membre
+    };
 
-            return View(versement);
-        }
+    return View(versement);
+}
 
-        // ➕ ENREGISTREMENT DU VERSEMENT (Côté Membre)
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Versement versement)
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Create(Versement versement, IFormFile? fichierPreuve, string ModePaiement)
+{
+    // On récupère les infos du membre et du groupe pour la redirection et l'email
+    var membre = await _context.Membres
+        .Include(m => m.Groupe)
+        .FirstOrDefaultAsync(m => m.Id == versement.MembreId);
+
+    if (ModelState.IsValid)
+    {
+        // 1. GESTION DU MODE DE PAIEMENT
+        versement.ModePaiement = ModePaiement;
+
+        // 2. GESTION DU FICHIER IMAGE (si présent)
+        if (fichierPreuve != null && fichierPreuve.Length > 0)
         {
-            if (ModelState.IsValid)
+            // Créer le nom unique du fichier (ex: 20240503_1230_nom.jpg)
+            string extension = Path.GetExtension(fichierPreuve.FileName);
+            string nouveauNomFichier = Guid.NewGuid().ToString() + extension;
+            
+            // Chemin physique vers wwwroot/uploads/preuves
+            string dossierUpload = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "preuves");
+
+            // Créer le dossier s'il n'existe pas
+            if (!Directory.Exists(dossierUpload)) Directory.CreateDirectory(dossierUpload);
+
+            string cheminComplet = Path.Combine(dossierUpload, nouveauNomFichier);
+
+            // Enregistrement du fichier sur le disque
+            using (var stream = new FileStream(cheminComplet, FileMode.Create))
             {
-                versement.Date = DateTime.Now;
-                versement.Statut = "En attente"; 
-
-                _context.Add(versement);
-                await _context.SaveChangesAsync();
-
-                var membre = await _context.Membres.FindAsync(versement.MembreId);
-                var groupe = await _context.Groupes.FindAsync(versement.GroupeId);
-
-                // MESSAGE DE CONFIRMATION SUR L'INTERFACE
-                TempData["SuccessMessage"] = "✅ Votre versement a été envoyé pour validation.";
-
-                // EMAIL : ACCUSÉ DE RÉCEPTION
-                if (membre != null && !string.IsNullOrWhiteSpace(membre.Email))
-                {
-                    try 
-                    {
-                        string sujet = "📩 Réception de versement - Tontine";
-                        string corps = $@"
-                            <div style='font-family: sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px;'>
-                                <h2 style='color: #2c3e50;'>Bonjour {membre.Nom},</h2>
-                                <p>Nous avons bien reçu votre déclaration de versement de <strong>{versement.Montant} Ar</strong>.</p>
-                                <p>L'administrateur du groupe va maintenant vérifier la transaction. Vous recevrez une confirmation dès que votre solde sera mis à jour.</p>
-                                <p style='color: #888; font-size: 12px;'>Ceci est un message automatique.</p>
-                            </div>";
-
-                        await _emailService.EnvoyerEmailAsync(membre.Email, sujet, corps);
-                    }
-                    catch (Exception ex) { _logger.LogError(ex, "Erreur email Create"); }
-                }
-
-                return RedirectToAction("VoirCommeMembe", "Groupes", new { codePartage = groupe?.CodePartage });
+                await fichierPreuve.CopyToAsync(stream);
             }
-            return View(versement);
+
+            // On stocke uniquement le nom du fichier dans l'objet Versement
+            versement.PreuveImage = nouveauNomFichier;
         }
 
+        versement.Statut = "En attente";
+        _context.Add(versement);
+        await _context.SaveChangesAsync();
+
+        // 3. EMAIL : ACCUSÉ DE RÉCEPTION
+        if (membre != null && !string.IsNullOrWhiteSpace(membre.Email))
+        {
+            try 
+            {
+                string sujet = "📩 Réception de versement - Tontine";
+                string corps = $@"
+                    <div style='font-family: sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px;'>
+                        <h2 style='color: #2c3e50;'>Bonjour {membre.Nom},</h2>
+                        <p>Nous avons bien reçu votre déclaration de versement de <strong>{versement.Montant.ToString("N0")} Ar</strong> via <strong>{versement.ModePaiement}</strong>.</p>
+                        <p>L'administrateur va vérifier la transaction. Vous recevrez une confirmation dès validation.</p>
+                        <hr>
+                        <p style='color: #888; font-size: 12px;'>Ceci est un message automatique de votre plateforme Tontine.</p>
+                    </div>";
+
+                await _emailService.EnvoyerEmailAsync(membre.Email, sujet, corps);
+            }
+            catch (Exception ex) { _logger.LogError(ex, "Erreur email Create"); }
+        }
+
+        TempData["SuccessMessage"] = "✅ Versement envoyé ! En attente de validation par l'admin.";
+        
+        return RedirectToAction("VoirCommeMembe", "Groupes", new { codePartage = membre?.Groupe?.CodePartage });
+    }
+
+    // Si erreur, on re-remplit l'objet membre pour que la vue ne plante pas
+    versement.Membre = membre;
+    return View(versement);
+}
         // ✅ CONFIRMER VERSEMENT (Côté Admin)
         [HttpPost]
         [ValidateAntiForgeryToken]

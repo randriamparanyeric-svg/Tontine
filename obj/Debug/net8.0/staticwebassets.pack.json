@@ -245,6 +245,10 @@
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
     },
     {
+      "Id": "C:\\Users\\HP\\Tontine\\wwwroot\\uploads\\preuves\\c6df8449-0337-45d3-85b8-ebfcd8337b98.JPG",
+      "PackagePath": "staticwebassets\\uploads\\preuves\\c6df8449-0337-45d3-85b8-ebfcd8337b98.JPG"
+    },
+    {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.Tontine.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

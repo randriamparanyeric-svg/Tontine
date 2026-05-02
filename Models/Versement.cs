@@ -21,5 +21,8 @@ namespace Tontine.Models
 
         public int GroupeId { get; set; }
         public Groupe? Groupe { get; set; }
+
+        public string ModePaiement { get; set; } // Mvola, Orange Money, Airtel Money, Espèce
+        public string? PreuveImage { get; set; } // Chemin de l'image
     }
 }

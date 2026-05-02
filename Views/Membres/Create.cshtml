@@ -1,23 +1,70 @@
 @model Tontine.Models.Membre
 
-<h1>Nouveau Membre</h1>
-<form asp-action="Create">
-    <div class="form-group">
-        <label>Nom</label>
-        <input asp-for="Nom" class="form-control" />
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white p-4 border-0">
+                    <h2 class="mb-0 fs-4"><i class="bi bi-person-plus-fill me-2"></i>Nouveau Membre</h2>
+                    <p class="mb-0 opacity-75">Inscrire un nouveau participant à une tontine</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Nom" class="form-label fw-bold">Nom complet</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                                <input asp-for="Nom" class="form-control form-control-lg" placeholder="Ex: Jean Dupont" required />
+                            </div>
+                            <span asp-validation-for="Nom" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="form-label fw-bold">Adresse Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                                <input asp-for="Email" type="email" class="form-control form-control-lg" placeholder="exemple@mail.com" required />
+                            </div>
+                            <small class="text-muted">Utilisé pour les notifications de versement.</small>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Telephone" class="form-label fw-bold">Téléphone</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-phone"></i></span>
+                                <input asp-for="Telephone" class="form-control form-control-lg" placeholder="Ex: 034 00 000 00" />
+                            </div>
+                            <span asp-validation-for="Telephone" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="GroupeId" class="form-label fw-bold">Attribuer à un Groupe</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-grid-3x3-gap"></i></span>
+                                <select asp-for="GroupeId" class="form-select form-select-lg" 
+                                        asp-items="@(new SelectList(ViewBag.Groupes, "Id", "Nom"))">
+                                    <option value="">-- Sélectionner un groupe --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="GroupeId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                                <i class="bi bi-check-circle me-2"></i>Enregistrer le membre
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label>Téléphone</label>
-        <input asp-for="Telephone" class="form-control" />
-    </div>
-    <div class="form-group">
-    <label>Attribuer à un Groupe</label>
-    <select asp-for="GroupeId" class="form-control" 
-            asp-items="@(new SelectList(ViewBag.Groupes, "Id", "Nom"))">
-        <option value="">-- Sélectionner un groupe --</option>
-    </select>
 </div>
-    <br />
-    <button type="submit" class="btn btn-success">Enregistrer</button>
-    <a asp-action="Index">Retour</a>
-</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

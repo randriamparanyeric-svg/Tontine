@@ -7,48 +7,98 @@
 
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>💵 Ajouter un Versement</h1>
-        <a asp-action="Index" asp-controller="Groupes" class="btn btn-secondary">🔙 Retour</a>
+        <h1>💵 Nouveau Versement</h1>
+        <a asp-action="VoirCommeMembe" asp-controller="Groupes" asp-route-codePartage="@Model.Membre?.Groupe?.CodePartage" class="btn btn-outline-secondary">🔙 Retour</a>
     </div>
 
-    <form asp-action="Create" method="post" class="card p-4">
+    @* CRUCIAL : enctype="multipart/form-data" pour permettre l'envoi de l'image preuve *@
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="card shadow-sm border-0 p-4">
         @Html.AntiForgeryToken()
 
-        <div class="alert alert-info">
-            <strong>👤 Membre:</strong> @Model.Membre?.Nom<br>
-            <strong>👥 Groupe:</strong> @Model.Membre?.Groupe?.Nom<br>
-            <strong>💰 Montant Standard:</strong> @Model.Membre?.Groupe?.MontantParVersement.ToString("N0") Ar
+        <div class="alert alert-info border-0 shadow-sm mb-4">
+            <div class="row">
+                <div class="col-md-4"><strong>👤 Membre:</strong> @Model.Membre?.Nom</div>
+                <div class="col-md-4"><strong>👥 Groupe:</strong> @Model.Membre?.Groupe?.Nom</div>
+                <div class="col-md-4"><strong>💰 Montant prévu:</strong> @Model.Membre?.Groupe?.MontantParVersement.ToString("N0") Ar</div>
+            </div>
         </div>
 
         <input type="hidden" asp-for="MembreId" />
         <input type="hidden" asp-for="GroupeId" />
 
-        <div class="form-group mb-3">
-            <label asp-for="Montant" class="form-label">💰 Montant (Ar)</label>
-            <input asp-for="Montant" type="number" step="1000" class="form-control" placeholder="Montant du versement">
-            <span asp-validation-for="Montant" class="text-danger"></span>
-            <small class="form-text text-muted">Montant recommandé : @Model.Membre?.Groupe?.MontantParVersement.ToString("N0") Ar</small>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Montant" class="form-label fw-bold">💰 Montant du versement (Ar)</label>
+                <input asp-for="Montant" type="number" step="1000" class="form-control form-control-lg border-primary" placeholder="Entrez le montant">
+                <span asp-validation-for="Montant" class="text-danger"></span>
+                <small class="text-muted">Recommandé : @Model.Membre?.Groupe?.MontantParVersement.ToString("N0") Ar</small>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="Date" class="form-label fw-bold">📅 Date de transaction</label>
+                <input asp-for="Date" type="datetime-local" class="form-control form-control-lg">
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
         </div>
 
-        <div class="form-group mb-3">
-            <label asp-for="Date" class="form-label">📅 Date</label>
-            <input asp-for="Date" type="datetime-local" class="form-control">
-            <span asp-validation-for="Date" class="text-danger"></span>
+        <hr class="my-4">
+
+        <div class="mb-4">
+            <label class="form-label fw-bold">💳 Choisissez votre mode de paiement</label>
+            <select name="ModePaiement" id="selectMode" class="form-select form-select-lg border-primary" required>
+                <option value="">-- Sélectionner --</option>
+                <option value="Mvola">Mvola</option>
+                <option value="Orange Money">Orange Money</option>
+                <option value="Airtel Money">Airtel Money</option>
+                <option value="Espèce">En Espèce (Main à main)</option>
+            </select>
         </div>
 
-        <div class="alert alert-warning">
-            <small>⏳ <strong>Note:</strong> Votre versement sera en attente de confirmation par l'admin.</small>
+        <div class="mb-4 p-4 border rounded bg-light shadow-sm" id="sectionPreuve" style="display: none;">
+            <label class="form-label fw-bold text-danger"><i class="bi bi-camera-fill"></i> Capture d'écran de la preuve</label>
+            <input type="file" name="fichierPreuve" id="inputPreuve" class="form-control" accept="image/*">
+            <div class="form-text mt-2 text-dark">
+                ⚠️ <strong>Obligatoire</strong> : Veuillez joindre le reçu de votre transfert mobile.
+            </div>
         </div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success btn-lg">✅ Enregistrer Versement</button>
-            <a asp-action="VoirCommeMembe" asp-controller="Groupes" asp-route-codePartage="@Model.Groupe?.CodePartage" class="btn btn-secondary btn-lg">❌ Annuler</a>
+        <div class="alert alert-warning border-0 d-flex align-items-center mb-4">
+            <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+            <div>Votre versement sera examiné par l'administrateur avant d'être ajouté à votre solde.</div>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <button type="submit" class="btn btn-success btn-lg px-5 shadow">🚀 Envoyer le Versement</button>
+            <a asp-action="VoirCommeMembe" asp-controller="Groupes" asp-route-codePartage="@Model.Membre?.Groupe?.CodePartage" class="btn btn-light btn-lg px-5 border">Annuler</a>
         </div>
     </form>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectMode = document.getElementById('selectMode');
+            const sectionPreuve = document.getElementById('sectionPreuve');
+            const inputPreuve = document.getElementById('inputPreuve');
+
+            selectMode.addEventListener('change', function () {
+                const mode = this.value;
+                const modesDigitaux = ['Mvola', 'Orange Money', 'Airtel Money'];
+
+                if (modesDigitaux.includes(mode)) {
+                    // Afficher le champ image et le rendre obligatoire
+                    sectionPreuve.style.display = 'block';
+                    inputPreuve.setAttribute('required', 'required');
+                    sectionPreuve.classList.add('animate__animated', 'animate__fadeIn');
+                } else {
+                    // Masquer le champ image et retirer l'obligation
+                    sectionPreuve.style.display = 'none';
+                    inputPreuve.removeAttribute('required');
+                    inputPreuve.value = ""; 
+                }
+            });
+        });
+    </script>
 }
