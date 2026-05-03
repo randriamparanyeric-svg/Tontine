@@ -23,7 +23,13 @@
                 <small class="badge bg-light text-dark border">📱 @membreActuel?.Telephone</small>
             </p>
         </div>
-        @{
+       
+        <form asp-action="QuitterGroupe" asp-route-groupeId="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger shadow-sm">🚪 Quitter</button>
+        </form>
+    </div>
+ @{
     // 1. Définir la date de début (Date de création du groupe)
     var dateDebut = Model.DateCreation; 
     var dateAujourdhui = DateTime.Now;
@@ -81,12 +87,6 @@
         </div>
     </div>
 </div>
-        <form asp-action="QuitterGroupe" asp-route-groupeId="@Model.Id" method="post">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="btn btn-outline-danger shadow-sm">🚪 Quitter</button>
-        </form>
-    </div>
-
     <div class="row mb-4 text-center">
         <div class="col-md-3 mb-2">
             <div class="card bg-primary text-white border-0 shadow-sm">

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "58XIlG4zv1Kdxq/AB6acuhu/sAB+qqdWo5EpHEqoOrw=",
+  "Hash": "BDTnJcea6Z0KFEFEs26ScR9niW9E2rOS9H+K/Vdjz9E=",
   "Source": "Tontine",
   "BasePath": "_content/Tontine",
   "Mode": "Default",
@@ -1193,6 +1193,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Identity": "C:\\Users\\HP\\Tontine\\wwwroot\\uploads\\preuves\\642ff3e9-1278-4c86-a74f-972eb2b8fba5.jpeg",
+      "SourceId": "Tontine",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\HP\\Tontine\\wwwroot\\",
+      "BasePath": "_content/Tontine",
+      "RelativePath": "uploads/preuves/642ff3e9-1278-4c86-a74f-972eb2b8fba5.jpeg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\preuves\\642ff3e9-1278-4c86-a74f-972eb2b8fba5.jpeg"
     },
     {
       "Identity": "C:\\Users\\HP\\Tontine\\wwwroot\\uploads\\preuves\\c6df8449-0337-45d3-85b8-ebfcd8337b98.JPG",
