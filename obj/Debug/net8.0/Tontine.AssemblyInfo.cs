@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Tontine")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ce5741bfee33e40591ab800911dbdb7fb233b0fe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+82b203e9822b1d11cacd9030445beba1f22d18d5")]
 [assembly: System.Reflection.AssemblyProductAttribute("Tontine")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Tontine")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

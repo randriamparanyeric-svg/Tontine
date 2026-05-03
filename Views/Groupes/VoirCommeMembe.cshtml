@@ -1,12 +1,14 @@
 @model Tontine.Models.Groupe
 @using Tontine.Models
+
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
+    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
+
 @{
     var membreActuel = ViewBag.MembreActuel as Membre;
 }
@@ -14,100 +16,156 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1>@Model.Nom</h1>
+            <h1 class="fw-bold text-primary">@Model.Nom</h1>
             <p class="text-muted">
                 👤 Bienvenue <strong>@membreActuel?.Nom</strong> 
                 <br>
-                <small>📱 @membreActuel?.Telephone</small>
+                <small class="badge bg-light text-dark border">📱 @membreActuel?.Telephone</small>
             </p>
         </div>
+        @{
+    // 1. Définir la date de début (Date de création du groupe)
+    var dateDebut = Model.DateCreation; 
+    var dateAujourdhui = DateTime.Now;
+    var dureeTotaleMois = Model.NombreMembresPrevu;
+
+    // 2. Calculer le nombre de mois écoulés
+    // (Année * 12 + Mois) - (Année * 12 + Mois)
+    var moisEcoules = ((dateAujourdhui.Year - dateDebut.Year) * 12) + dateAujourdhui.Month - dateDebut.Month;
+
+    // 3. Limiter entre 0 et le maximum pour éviter les bugs d'affichage
+    if (moisEcoules < 0) moisEcoules = 0;
+    var moisAffichage = moisEcoules > dureeTotaleMois ? dureeTotaleMois : moisEcoules;
+
+    // 4. Calcul du pourcentage pour la barre
+    double pourcentageTemps = ((double)moisAffichage / dureeTotaleMois) * 100;
+
+    // 5. Couleur de la barre selon l'avancement
+    string couleurBarre = "bg-primary";
+    if (pourcentageTemps >= 100) couleurBarre = "bg-success";
+}
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0">
+                <i class="bi bi-calendar-range text-primary me-2"></i>
+                Progression de la Tontine (Durée : @dureeTotaleMois mois)
+            </h6>
+            <span class="badge bg-dark">
+                Mois @moisAffichage / @dureeTotaleMois
+            </span>
+        </div>
+
+        <div class="progress" style="height: 15px; border-radius: 10px; background-color: #f0f2f5;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated @couleurBarre" 
+                 role="progressbar" 
+                 style="width: @pourcentageTemps.ToString("0")%;" 
+                 aria-valuenow="@pourcentageTemps" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100">
+                 @if(pourcentageTemps > 10) { <span>@pourcentageTemps.ToString("0")%</span> }
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-2 small text-muted">
+            <span>Début : @dateDebut.ToString("MMMM yyyy")</span>
+            @if (moisEcoules >= dureeTotaleMois)
+            {
+                <span class="text-success fw-bold">Tontine terminée ! ✅</span>
+            }
+            else
+            {
+                <span>Fin prévue : @dateDebut.AddMonths(dureeTotaleMois).ToString("MMMM yyyy")</span>
+            }
+        </div>
+    </div>
+</div>
         <form asp-action="QuitterGroupe" asp-route-groupeId="@Model.Id" method="post">
             @Html.AntiForgeryToken()
-            <button type="submit" class="btn btn-danger">🚪 Quitter</button>
+            <button type="submit" class="btn btn-outline-danger shadow-sm">🚪 Quitter</button>
         </form>
     </div>
 
-    <!-- STATISTIQUES -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
+    <div class="row mb-4 text-center">
+        <div class="col-md-3 mb-2">
+            <div class="card bg-primary text-white border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">💰 Montant</h5>
-                    <h2>@Model.MontantParVersement.ToString("N0")</h2>
-                    <small>Ar par versement</small>
+                    <h5 class="card-title opacity-75 small">💰 MONTANT</h5>
+                    <h2 class="fw-bold">@Model.MontantParVersement.ToString("N0")</h2>
+                    <small>Ar / versement</small>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
+        <div class="col-md-3 mb-2">
+            <div class="card bg-success text-white border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">👥 Membres</h5>
-                    <h2>@Model.Membres.Count</h2>
+                    <h5 class="card-title opacity-75 small">👥 MEMBRES</h5>
+                    <h2 class="fw-bold">@Model.Membres.Count</h2>
                     <small>/ @Model.NombreMembresPrevu</small>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
+        <div class="col-md-3 mb-2">
+            <div class="card bg-info text-white border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">💵 Mon Total</h5>
-                    <h2>@membreActuel?.Versements.Sum(v => v.Montant).ToString("N0")</h2>
-                    <small>Ar versés</small>
+                    <h5 class="card-title opacity-75 small">💵 MON TOTAL</h5>
+                    <h2 class="fw-bold">@membreActuel?.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0")</h2>
+                    <small>Ar validés</small>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
+        <div class="col-md-3 mb-2">
+            <div class="card bg-warning text-dark border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">📊 Mes Versements</h5>
-                    <h2>@membreActuel?.Versements.Count</h2>
+                    <h5 class="card-title opacity-75 small">📊 MES DEPOTS</h5>
+                    <h2 class="fw-bold">@membreActuel?.Versements.Count</h2>
                     <small>enregistrés</small>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- APPEL À ACTION -->
-    <div class="alert alert-success mb-4">
-        <h5>💰 Effectuer un Versement</h5>
-        <p>Cliquez sur le bouton pour enregistrer votre versement. L'admin le confirmera.</p>
-        <a asp-controller="Versements" asp-action="Create" asp-route-membreId="@membreActuel?.Id" class="btn btn-lg btn-success">
-            ➕ Verser Maintenant
-        </a>
+    <div class="card border-0 shadow-sm bg-light mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="fw-bold mb-1">💸 Prêt pour votre cotisation ?</h5>
+                <p class="text-muted mb-0 small">Enregistrez votre paiement et joignez la capture pour validation.</p>
+            </div>
+            <a asp-controller="Versements" asp-action="Create" asp-route-membreId="@membreActuel?.Id" class="btn btn-success px-4 fw-bold shadow">
+                ➕ Verser Maintenant
+            </a>
+        </div>
     </div>
 
-    <!-- TOUS LES MEMBRES -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">👥 Tous les Membres (@Model.Membres.Count)</h5>
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-people me-2"></i>Tous les Membres (@Model.Membres.Count)</h5>
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             @if (Model.Membres.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <th>Nom</th>
+                                <th class="ps-3">Nom</th>
                                 <th>Téléphone</th>
-                                <th>Versements</th>
-                                <th>Total</th>
+                                <th class="text-center">Versements</th>
+                                <th class="text-end pe-3">Total Validé</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var membre in Model.Membres)
                             {
                                 <tr class="@(membre.Id == membreActuel?.Id ? "table-info" : "")">
-                                    <td>
+                                    <td class="ps-3 fw-bold">
                                         @membre.Nom
-                                        @if (membre.Id == membreActuel?.Id)
-                                        {
-                                            <span class="badge bg-info">Vous</span>
-                                        }
+                                        @if (membre.Id == membreActuel?.Id) { <span class="badge bg-primary ms-1">Moi</span> }
                                     </td>
                                     <td>@membre.Telephone</td>
-                                    <td>@membre.Versements.Count</td>
-                                    <td>@membre.Versements.Sum(v => v.Montant).ToString("N0") Ar</td>
+                                    <td class="text-center">@membre.Versements.Count(v => v.Statut == "Confirmé") ✅</td>
+                                    <td class="text-end pe-3 fw-bold text-success">@membre.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0") Ar</td>
                                 </tr>
                             }
                         </tbody>
@@ -117,87 +175,92 @@
         </div>
     </div>
 
-    <!-- MES VERSEMENTS EN ATTENTE -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0">⏳ Mes Versements en Attente</h5>
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-warning text-dark py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-hourglass-split me-2"></i>Suivi de mes envois</h5>
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             @{
-                var mesVersementsEnAttente = membreActuel?.Versements
-                    .Where(v => v.Statut == "En attente")
-                    .OrderByDescending(v => v.Date)
-                    .ToList();
+                var mesEnvois = membreActuel?.Versements
+                    .Where(v => v.Statut == "En attente" || v.Statut == "Rejeté")
+                    .OrderByDescending(v => v.Date).ToList();
             }
-            @if (mesVersementsEnAttente?.Any() == true)
+            @if (mesEnvois?.Any() == true)
             {
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle mb-0">
                         <thead>
-                            <tr>
-                                <th>Montant</th>
+                            <tr class="small text-muted">
+                                <th class="ps-3">Montant</th>
                                 <th>Date</th>
-                                <th>Statut</th>
+                                <th class="text-center">Preuve</th>
+                                <th class="text-end pe-3">Statut</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var versement in mesVersementsEnAttente)
+                            @foreach (var v in mesEnvois)
                             {
-                                <tr>
-                                    <td>@versement.Montant.ToString("N0") Ar</td>
-                                    <td>@versement.Date.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td><span class="badge bg-warning">⏳ En attente</span></td>
+                                <tr class="@(v.Statut == "Rejeté" ? "table-danger" : "")">
+                                    <td class="ps-3 fw-bold">@v.Montant.ToString("N0") Ar</td>
+                                    <td class="small">@v.Date.ToString("dd/MM/yy HH:mm")</td>
+                                    <td class="text-center">
+                                        @if (!string.IsNullOrEmpty(v.PreuveImage)) {
+                                            <a href="~/uploads/preuves/@v.PreuveImage" target="_blank" class="btn btn-sm btn-outline-secondary py-0">🖼️ Voir</a>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        @if(v.Statut == "En attente") { <span class="badge bg-warning text-dark">⏳ Attente</span> }
+                                        else { <span class="badge bg-danger">❌ Rejeté</span> }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
             }
-            else
-            {
-                <p class="text-muted">Tous vos versements sont confirmés ! ✅</p>
-            }
+            else { <p class="p-3 mb-0 text-muted small">Aucun dossier en cours.</p> }
         </div>
     </div>
 
-    <!-- MES VERSEMENTS CONFIRMÉS -->
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0">✅ Mes Versements Confirmés</h5>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-check-all me-2"></i>Mes Versements Confirmés</h5>
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             @{
-                var mesVersementsConfirmes = membreActuel?.Versements
+                var mesConfirmes = membreActuel?.Versements
                     .Where(v => v.Statut == "Confirmé")
-                    .OrderByDescending(v => v.Date)
-                    .ToList();
+                    .OrderByDescending(v => v.Date).ToList();
             }
-            @if (mesVersementsConfirmes?.Any() == true)
+            @if (mesConfirmes?.Any() == true)
             {
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <th>Montant</th>
+                                <th class="ps-3">Montant</th>
                                 <th>Date</th>
+                                <th class="text-end pe-3">Preuve</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var versement in mesVersementsConfirmes)
+                            @foreach (var v in mesConfirmes)
                             {
                                 <tr>
-                                    <td>@versement.Montant.ToString("N0") Ar</td>
-                                    <td>@versement.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="ps-3 fw-bold text-success">@v.Montant.ToString("N0") Ar</td>
+                                    <td>@v.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="text-end pe-3">
+                                        @if (!string.IsNullOrEmpty(v.PreuveImage)) {
+                                            <a href="~/uploads/preuves/@v.PreuveImage" target="_blank" class="text-info text-decoration-none small">📁 Reçu</a>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
             }
-            else
-            {
-                <p class="text-muted">Aucun versement confirmé pour le moment.</p>
-            }
+            else { <p class="p-3 mb-0 text-muted">Aucun versement confirmé.</p> }
         </div>
     </div>
 </div>

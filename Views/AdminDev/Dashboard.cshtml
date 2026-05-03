@@ -20,7 +20,8 @@
                     <th>Date</th>
                     <th>Nom de la Tontine</th>
                     <th>Administrateur</th>
-                    <th class="text-center">Membres</th>
+                    <th class="text-center">Durée Prévue</th>
+                    <th>Progression (Temps)</th>
                     <th class="text-center">Statut</th>
                     <th class="text-end">Actions</th>
                 </tr>
@@ -28,6 +29,19 @@
             <tbody>
                 @foreach (var item in Model)
                 {
+                    // --- CALCUL DE LA PROGRESSION TEMPORELLE ---
+                    var dateDebut = item.DateCreation;
+                    var dateActuelle = DateTime.Now;
+                    var dureeTotaleMois = item.NombreMembresPrevu;
+
+                    // Calcul des mois écoulés
+                    var moisEcoules = ((dateActuelle.Year - dateDebut.Year) * 12) + dateActuelle.Month - dateDebut.Month;
+                    if (moisEcoules < 0) moisEcoules = 0;
+                    
+                    var moisAffichage = moisEcoules > dureeTotaleMois ? dureeTotaleMois : moisEcoules;
+                    double pourcentage = ((double)moisAffichage / dureeTotaleMois) * 100;
+                    // -------------------------------------------
+
                     <tr>
                         <td>@item.DateCreation.ToString("dd/MM/yyyy")</td>
                         <td>
@@ -38,7 +52,22 @@
                             <small class="text-muted">@item.AdminEmail</small>
                         </td>
                         <td class="text-center">
-                            <span class="badge rounded-pill bg-secondary">@item.NombreMembresPrevu</span>
+                            <span class="badge rounded-pill bg-secondary">@item.NombreMembresPrevu mois</span>
+                        </td>
+                        <td style="min-width: 150px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar @(pourcentage >= 100 ? "bg-success" : "bg-info")" 
+                                         role="progressbar" 
+                                         style="width: @pourcentage.ToString("0")%"></div>
+                                </div>
+                                <small class="fw-bold">@moisAffichage/@dureeTotaleMois</small>
+                            </div>
+                            @if(moisEcoules >= dureeTotaleMois) {
+                                <small class="text-success" style="font-size: 0.7rem;">Terminé ✅</small>
+                            } else {
+                                <small class="text-muted" style="font-size: 0.7rem;">En cours...</small>
+                            }
                         </td>
                         <td class="text-center">
                             @if (item.EstValideParDev)
@@ -78,7 +107,7 @@
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">
+                        <td colspan="7" class="text-center py-4 text-muted">
                             Aucune tontine enregistrée pour le moment.
                         </td>
                     </tr>

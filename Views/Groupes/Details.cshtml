@@ -1,85 +1,165 @@
 @model Tontine.Models.Groupe
+
+@{
+    ViewData["Title"] = "Administration - " + Model.Nom;
+}
+
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-            <h1>@Model.Nom</h1>
-            <p class="text-muted">🔐 Espace Admin</p>
+            <h1 class="fw-bold text-primary">@Model.Nom</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item text-muted">🔐 Espace Administration</li>
+                    <li class="breadcrumb-item active">Tableau de bord</li>
+                </ol>
+            </nav>
         </div>
+        @{
+    // 1. Définir la date de début (Date de création du groupe)
+    var dateDebut = Model.DateCreation; 
+    var dateAujourdhui = DateTime.Now;
+    var dureeTotaleMois = Model.NombreMembresPrevu;
+
+    // 2. Calculer le nombre de mois écoulés
+    // (Année * 12 + Mois) - (Année * 12 + Mois)
+    var moisEcoules = ((dateAujourdhui.Year - dateDebut.Year) * 12) + dateAujourdhui.Month - dateDebut.Month;
+
+    // 3. Limiter entre 0 et le maximum pour éviter les bugs d'affichage
+    if (moisEcoules < 0) moisEcoules = 0;
+    var moisAffichage = moisEcoules > dureeTotaleMois ? dureeTotaleMois : moisEcoules;
+
+    // 4. Calcul du pourcentage pour la barre
+    double pourcentageTemps = ((double)moisAffichage / dureeTotaleMois) * 100;
+
+    // 5. Couleur de la barre selon l'avancement
+    string couleurBarre = "bg-primary";
+    if (pourcentageTemps >= 100) couleurBarre = "bg-success";
+}
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0">
+                <i class="bi bi-calendar-range text-primary me-2"></i>
+                Progression de la Tontine (Durée : @dureeTotaleMois mois)
+            </h6>
+            <span class="badge bg-dark">
+                Mois @moisAffichage / @dureeTotaleMois
+            </span>
+        </div>
+
+        <div class="progress" style="height: 15px; border-radius: 10px; background-color: #f0f2f5;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated @couleurBarre" 
+                 role="progressbar" 
+                 style="width: @pourcentageTemps.ToString("0")%;" 
+                 aria-valuenow="@pourcentageTemps" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100">
+                 @if(pourcentageTemps > 10) { <span>@pourcentageTemps.ToString("0")%</span> }
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-2 small text-muted">
+            <span>Début : @dateDebut.ToString("MMMM yyyy")</span>
+            @if (moisEcoules >= dureeTotaleMois)
+            {
+                <span class="text-success fw-bold">Tontine terminée ! ✅</span>
+            }
+            else
+            {
+                <span>Fin prévue : @dateDebut.AddMonths(dureeTotaleMois).ToString("MMMM yyyy")</span>
+            }
+        </div>
+    </div>
+</div>
         <div class="d-flex gap-2">
-            <form asp-action="QuitterGroupe" asp-route-groupeId="@Model.Id" method="post" style="display:inline;">
+            <form asp-action="QuitterGroupe" asp-route-groupeId="@Model.Id" method="post">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-warning">🚪 Déconnexion</button>
+                <button type="submit" class="btn btn-warning shadow-sm">
+                    <i class="bi bi-box-arrow-right me-1"></i> Déconnexion
+                </button>
             </form>
-            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
-                🗑️ Supprimer le Groupe
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger shadow-sm" 
+               onclick="return confirm('Attention : Cette action est irréversible !')">
+                <i class="bi bi-trash me-1"></i> Supprimer le Groupe
             </a>
         </div>
     </div>
 
-    @if (!Model.Membres.Any())
-    {
-        <div class="alert alert-warning mb-4 shadow-sm">
-            <strong>⚠️ Attention :</strong> Vous n'avez aucun membre inscrit. 
-            <a asp-controller="Membres" asp-action="Create" asp-route-groupeId="@Model.Id" class="alert-link">Ajouter un membre maintenant</a>.
-        </div>
-    }
-
-    <div class="row mb-4">
+    <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card bg-primary text-white shadow-sm">
-                <div class="card-body text-center">
-                    <h6 class="card-title text-uppercase opacity-75">💰 Montant Unitaire</h6>
-                    <h2 class="mb-0">@Model.MontantParVersement.ToString("N0") <small>Ar</small></h2>
+            <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                <div class="card-body">
+                    <h6 class="text-uppercase opacity-75 small fw-bold">💰 Montant Unitaire</h6>
+                    <h3 class="mb-0">@Model.MontantParVersement.ToString("N0") <small class="fs-6">Ar</small></h3>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-success text-white shadow-sm">
-                <div class="card-body text-center">
-                    <h6 class="card-title text-uppercase opacity-75">👥 Membres</h6>
-                    <h2 class="mb-0">@Model.Membres.Count / @Model.NombreMembresPrevu</h2>
+            <div class="card border-0 shadow-sm bg-success text-white h-100">
+                <div class="card-body">
+                    <h6 class="text-uppercase opacity-75 small fw-bold">👥 Membres</h6>
+                    <h3 class="mb-0">@Model.Membres.Count / @Model.NombreMembresPrevu</h3>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-info text-white shadow-sm">
-                <div class="card-body text-center">
-                    <h6 class="card-title text-uppercase opacity-75">💵 Collecté</h6>
-                    <h2 class="mb-0">@Model.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0")</h2>
+            <div class="card border-0 shadow-sm bg-info text-white h-100">
+                <div class="card-body">
+                    <h6 class="text-uppercase opacity-75 small fw-bold">💵 Total Collecté</h6>
+                    <h3 class="mb-0">@Model.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0") <small class="fs-6">Ar</small></h3>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-warning text-white shadow-sm">
-                <div class="card-body text-center">
-                    <h6 class="card-title text-uppercase opacity-75">⏳ En Attente</h6>
-                    <h2 class="mb-0">@Model.Versements.Where(v => v.Statut == "En attente").Sum(v => v.Montant).ToString("N0")</h2>
+            <div class="card border-0 shadow-sm bg-warning text-white h-100">
+                <div class="card-body">
+                    <h6 class="text-uppercase opacity-75 small fw-bold">⏳ En Attente</h6>
+                    <h3 class="mb-0">@Model.Versements.Where(v => v.Statut == "En attente").Sum(v => v.Montant).ToString("N0") <small class="fs-6">Ar</small></h3>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="alert alert-info mb-4 border-0 shadow-sm">
-        <h5 class="alert-heading">🔗 Lien de Partage</h5>
-        <p class="mb-2 text-dark">Partagez ce lien avec vos membres pour qu'ils puissent s'inscrire :</p>
-        <div class="input-group">
-            <input type="text" class="form-control" readonly id="shareLink" 
-                   value="@($"{Context.Request.Scheme}://{Context.Request.Host}/groupe/{Model.CodePartage}")">
-            <button class="btn btn-info text-white" onclick="copyLink()">📋 Copier le lien</button>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body bg-light rounded">
+            <h5 class="card-title fw-bold"><i class="bi bi-share me-2 text-primary"></i>Lien d'invitation</h5>
+            <p class="text-muted small">Partagez ce lien pour que les membres puissent rejoindre le groupe et effectuer leurs versements.</p>
+            <div class="input-group">
+                <input type="text" class="form-control bg-white border-primary" readonly id="shareLink" 
+                       value="@($"{Context.Request.Scheme}://{Context.Request.Host}/groupe/{Model.CodePartage}")">
+                <button class="btn btn-primary" onclick="copyLink()">
+                    <i class="bi bi-clipboard me-1"></i> Copier
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="card mb-4 border-warning shadow-sm">
-        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">⏳ Versements en attente de validation</h5>
-            <span class="badge bg-dark">@Model.Versements.Count(v => v.Statut == "En attente")</span>
+    <div class="card border-0 shadow-sm mb-4 border-start border-warning border-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-dark">
+                <i class="bi bi-clock-history me-2 text-warning"></i>Versements à valider
+            </h5>
+            <span class="badge bg-warning text-dark rounded-pill">
+                @Model.Versements.Count(v => v.Statut == "En attente") en attente
+            </span>
         </div>
         <div class="card-body">
             @{ var pending = Model.Versements.Where(v => v.Statut == "En attente").ToList(); }
@@ -87,11 +167,13 @@
             {
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead>
+                        <thead class="table-light">
                             <tr>
                                 <th>Membre</th>
                                 <th>Montant</th>
-                                <th>Date de soumission</th>
+                                <th>Mode</th>
+                                <th>Preuve</th>
+                                <th>Date</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -100,17 +182,29 @@
                             {
                                 <tr>
                                     <td><strong>@v.Membre?.Nom</strong></td>
-                                    <td><span class="text-success fw-bold">@v.Montant.ToString("N0") Ar</span></td>
-                                    <td>@v.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="fw-bold text-success">@v.Montant.ToString("N0") Ar</td>
+                                    <td><span class="badge bg-light text-dark border">@v.ModePaiement</span></td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(v.PreuveImage))
+                                        {
+                                            <a href="~/uploads/preuves/@v.PreuveImage" target="_blank" class="btn btn-sm btn-outline-info">
+                                                <i class="bi bi-eye"></i> Voir Reçu
+                                            </a>
+                                        }
+                                        else { <span class="text-muted small italic">Aucun fichier</span> }
+                                    </td>
+                                    <td class="small text-muted">@v.Date.ToString("dd/MM/yyyy HH:mm")</td>
                                     <td class="text-end">
-                                        <form asp-action="Confirmer" asp-controller="Versements" asp-route-id="@v.Id" method="post" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-success">✅ Valider</button>
-                                        </form>
-                                        <form asp-action="Rejeter" asp-controller="Versements" asp-route-id="@v.Id" method="post" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Refuser ce versement ?')">❌ Rejeter</button>
-                                        </form>
+                                        <div class="btn-group shadow-sm">
+                                            <form asp-action="Confirmer" asp-controller="Versements" asp-route-id="@v.Id" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-success rounded-start">Valider</button>
+                                            </form>
+                                            <form asp-action="Rejeter" asp-controller="Versements" asp-route-id="@v.Id" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-danger rounded-end" onclick="return confirm('Rejeter ce paiement ?')">Refuser</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -120,40 +214,47 @@
             }
             else
             {
-                <p class="text-muted mb-0">✨ Aucun versement en attente de confirmation.</p>
+                <div class="text-center py-4">
+                    <i class="bi bi-check2-all fs-1 text-muted"></i>
+                    <p class="text-muted mt-2">Tous les versements sont à jour !</p>
+                </div>
             }
         </div>
     </div>
 
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">👥 Liste des Membres</h5>
-            <a asp-controller="Membres" asp-action="Create" asp-route-groupeId="@Model.Id" class="btn btn-sm btn-light fw-bold">➕ Ajouter</a>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+            <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-people me-2"></i>Membres du groupe</h5>
+            <a asp-controller="Membres" asp-action="Create" asp-route-groupeId="@Model.Id" class="btn btn-sm btn-primary">
+                <i class="bi bi-person-plus me-1"></i> Ajouter un membre
+            </a>
         </div>
         <div class="card-body">
             @if (Model.Membres.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
+                    <table class="table table-hover align-middle">
+                        <thead>
                             <tr>
-                                <th>Nom du membre</th>
+                                <th>Nom</th>
                                 <th>Téléphone</th>
                                 <th class="text-center">Versements</th>
                                 <th>Total Cotisé</th>
-                                <th>Action</th>
+                                <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var membre in Model.Membres)
                             {
                                 <tr>
-                                    <td>@membre.Nom</td>
+                                    <td class="fw-bold">@membre.Nom</td>
                                     <td>@membre.Telephone</td>
-                                    <td class="text-center">@membre.Versements.Count</td>
-                                    <td class="fw-bold">@membre.Versements.Sum(v => v.Montant).ToString("N0") Ar</td>
-                                    <td>
-                                        <a asp-controller="Membres" asp-action="Edit" asp-route-id="@membre.Id" class="btn btn-sm btn-outline-warning">✏️</a>
+                                    <td class="text-center"><span class="badge bg-secondary rounded-pill">@membre.Versements.Count</span></td>
+                                    <td class="fw-bold">@membre.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0") Ar</td>
+                                    <td class="text-end">
+                                        <a asp-controller="Membres" asp-action="Edit" asp-route-id="@membre.Id" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-pencil-square fs-5"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             }
@@ -161,54 +262,23 @@
                     </table>
                 </div>
             }
-        </div>
-    </div>
-
-    <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">📜 Historique complet des transactions</h5>
-        </div>
-        <div class="card-body">
-            @if (Model.Versements.Any())
+            else
             {
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Membre</th>
-                                <th>Montant</th>
-                                <th>Date</th>
-                                <th>Statut</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var versement in Model.Versements.OrderByDescending(v => v.Date))
-                            {
-                                <tr>
-                                    <td>@versement.Membre?.Nom</td>
-                                    <td>@versement.Montant.ToString("N0") Ar</td>
-                                    <td>@versement.Date.ToString("dd/MM/yy HH:mm")</td>
-                                    <td>
-                                        @if (versement.Statut == "Confirmé") { <span class="badge bg-success">Confirmé</span> }
-                                        else if (versement.Statut == "En attente") { <span class="badge bg-warning text-dark">En attente</span> }
-                                        else { <span class="badge bg-danger">Rejeté</span> }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                <p class="text-center text-muted">Aucun membre pour le moment.</p>
             }
         </div>
     </div>
 </div>
 
-<script>
-    function copyLink() {
-        var copyText = document.getElementById("shareLink");
-        copyText.select();
-        copyText.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(copyText.value);
-        alert("Lien copié !");
-    }
-</script>
+@section Scripts {
+    <script>
+        function copyLink() {
+            var copyText = document.getElementById("shareLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("✅ Lien d'invitation copié avec succès !");
+            });
+        }
+    </script>
+}

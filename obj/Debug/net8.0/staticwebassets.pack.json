@@ -245,8 +245,16 @@
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
     },
     {
+      "Id": "C:\\Users\\HP\\Tontine\\wwwroot\\uploads\\preuves\\642ff3e9-1278-4c86-a74f-972eb2b8fba5.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\preuves\\642ff3e9-1278-4c86-a74f-972eb2b8fba5.jpeg"
+    },
+    {
       "Id": "C:\\Users\\HP\\Tontine\\wwwroot\\uploads\\preuves\\c6df8449-0337-45d3-85b8-ebfcd8337b98.JPG",
       "PackagePath": "staticwebassets\\uploads\\preuves\\c6df8449-0337-45d3-85b8-ebfcd8337b98.JPG"
+    },
+    {
+      "Id": "C:\\Users\\HP\\Tontine\\wwwroot\\uploads\\preuves\\d22b870c-c326-4499-94db-27d1ea5103e2.JPG",
+      "PackagePath": "staticwebassets\\uploads\\preuves\\d22b870c-c326-4499-94db-27d1ea5103e2.JPG"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.Tontine.Microsoft.AspNetCore.StaticWebAssets.props",
