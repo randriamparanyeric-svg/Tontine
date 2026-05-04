@@ -17,7 +17,6 @@
                                 <div class="card-body">
                                     <h5>💰 Montant par Versement</h5>
                                     <h2>@Model.MontantParVersement.ToString("N0").Replace(",", " ") <small>Ar</small></h2>
-                                    
                                 </div>
                             </div>
                         </div>
@@ -26,16 +25,14 @@
                                 <div class="card-body">
                                     <h5>👥 Membres</h5>
                                     <h2>@Model.Membres.Count  <small>/ @Model.NombreMembresPrevu</small></h2>
-                                   
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- DEUX BOUTONS -->
                     <div class="d-grid gap-2 mb-3">
                         <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#adminModal">
-                            🔐 Accès Admin (Mot de passe)
+                            🔐 Accès Trésorier seulement (Mot de passe)
                         </button>
                         <a asp-action="IdentifierMembre" asp-route-codePartage="@Model.CodePartage" class="btn btn-info btn-lg">
                             👁️ Voir comme Membre
@@ -46,7 +43,6 @@
         </div>
     </div>
 
-    <!-- MODAL ADMIN - DEMANDE MOT DE PASSE -->
     <div class="modal fade" id="adminModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -59,7 +55,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="motDePasse" class="form-label fw-bold">🔑 Mot de Passe Admin</label>
-                            <input type="password" name="motDePasse" id="motDePasse" class="form-control" placeholder="Entrez votre mot de passe" required autofocus>
+                            <input type="password" name="motDePasse" id="motDePasse" class="form-control" placeholder="Entrez votre mot de passe" required>
                             
                             <div class="text-end mt-2">
                                 <a asp-action="ForgotPassword" class="text-muted small">Mot de passe oublié ?</a>
@@ -82,13 +78,23 @@
         </div>
     </div>
 
-<!-- AUTO-OUVRIR LA MODAL SI ERREUR -->
-@if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)
-{
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var modal = new bootstrap.Modal(document.getElementById('adminModal'));
-            modal.show();
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var myModal = document.getElementById('adminModal');
+        var myInput = document.getElementById('motDePasse');
+
+        // Force le focus sur l'input quand la modal finit de s'afficher
+        myModal.addEventListener('shown.bs.modal', function () {
+            myInput.focus();
         });
-    </script>
-}
+
+        // AUTO-OUVRIR LA MODAL SI ERREUR
+        @if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)
+        {
+            <text>
+            var modal = new bootstrap.Modal(myModal);
+            modal.show();
+            </text>
+        }
+    });
+</script>

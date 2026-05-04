@@ -168,5 +168,26 @@ messageBody = $@"
             HttpContext.Session.Clear();
             return RedirectToAction(nameof(Login));
         }
+      [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> DeleteGroupe(int id, string passwordConfirm)
+{
+    // 1. Vérification du mot de passe (Remplacez "VotreMotDePasse" par votre logique)
+    if (passwordConfirm != "819600") 
+    {
+        TempData["ErrorMessage"] = "❌ Mot de passe incorrect. Suppression annulée.";
+        return RedirectToAction(nameof(Dashboard));
+    }
+
+    var groupe = await _context.Groupes.FindAsync(id);
+    if (groupe != null)
+    {
+        _context.Groupes.Remove(groupe);
+        await _context.SaveChangesAsync();
+        TempData["SuccessMessage"] = "✅ La tontine a été supprimée définitivement.";
+    }
+
+    return RedirectToAction(nameof(Dashboard));
+}
     }
 }

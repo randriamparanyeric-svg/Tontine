@@ -273,12 +273,37 @@
 @section Scripts {
     <script>
         function copyLink() {
-            var copyText = document.getElementById("shareLink");
+            const copyText = document.getElementById("shareLink");
+            
+            // 1. Sélection visuelle (utile pour l'utilisateur)
             copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(copyText.value).then(() => {
-                alert("✅ Lien d'invitation copié avec succès !");
-            });
+            copyText.setSelectionRange(0, 99999); // Pour mobile
+
+            // 2. Tentative avec l'API moderne
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(copyText.value).then(() => {
+                    afficherAlerte();
+                }).catch(err => {
+                    // Secours si l'API échoue
+                    executerCopieClassique();
+                });
+            } else {
+                // Secours pour les anciens navigateurs ou HTTP non sécurisé
+                executerCopieClassique();
+            }
+        }
+
+        function executerCopieClassique() {
+            try {
+                document.execCommand("copy");
+                afficherAlerte();
+            } catch (err) {
+                console.error("Impossible de copier", err);
+            }
+        }
+
+        function afficherAlerte() {
+            alert("✅ Lien d'invitation copié avec succès !");
         }
     </script>
 }
