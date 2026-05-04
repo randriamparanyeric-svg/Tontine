@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "IIf3rE7u7beTmD/WBgOcSVFBStZhP9ajIMMFPdxbkRc=",
+  "Hash": "K4DsoKor+RsGiUZVlVVUHGSUcoqlGUb3t8cxObfW/SE=",
   "Source": "Tontine",
   "BasePath": "_content/Tontine",
   "Mode": "Default",
@@ -1195,6 +1195,25 @@
       "OriginalItemSpec": "wwwroot\\lib\\jquery\\LICENSE.txt"
     },
     {
+      "Identity": "C:\\Users\\HP\\Tontine\\wwwroot\\uploads\\preuves\\56412d80-fa8e-431e-b5c9-c0af3085066a.jpeg",
+      "SourceId": "Tontine",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\HP\\Tontine\\wwwroot\\",
+      "BasePath": "_content/Tontine",
+      "RelativePath": "uploads/preuves/56412d80-fa8e-431e-b5c9-c0af3085066a.jpeg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\preuves\\56412d80-fa8e-431e-b5c9-c0af3085066a.jpeg"
+    },
+    {
       "Identity": "C:\\Users\\HP\\Tontine\\wwwroot\\uploads\\preuves\\642ff3e9-1278-4c86-a74f-972eb2b8fba5.jpeg",
       "SourceId": "Tontine",
       "SourceType": "Discovered",
@@ -1250,6 +1269,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\uploads\\preuves\\d22b870c-c326-4499-94db-27d1ea5103e2.JPG"
+    },
+    {
+      "Identity": "C:\\Users\\HP\\Tontine\\wwwroot\\uploads\\preuves\\fe12c76e-d26c-499b-8b45-6d2d402f47e4.jpg",
+      "SourceId": "Tontine",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\HP\\Tontine\\wwwroot\\",
+      "BasePath": "_content/Tontine",
+      "RelativePath": "uploads/preuves/fe12c76e-d26c-499b-8b45-6d2d402f47e4.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\preuves\\fe12c76e-d26c-499b-8b45-6d2d402f47e4.jpg"
     }
   ]
 }

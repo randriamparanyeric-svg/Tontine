@@ -16,8 +16,8 @@
                             <div class="card bg-primary text-white">
                                 <div class="card-body">
                                     <h5>💰 Montant par Versement</h5>
-                                    <h2>@Model.MontantParVersement.ToString("N0")</h2>
-                                    <small>Ar</small>
+                                    <h2>@Model.MontantParVersement.ToString("N0").Replace(",", " ") <small>Ar</small></h2>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -25,8 +25,8 @@
                             <div class="card bg-success text-white">
                                 <div class="card-body">
                                     <h5>👥 Membres</h5>
-                                    <h2>@Model.Membres.Count</h2>
-                                    <small>/ @Model.NombreMembresPrevu</small>
+                                    <h2>@Model.Membres.Count  <small>/ @Model.NombreMembresPrevu</small></h2>
+                                   
                                 </div>
                             </div>
                         </div>
