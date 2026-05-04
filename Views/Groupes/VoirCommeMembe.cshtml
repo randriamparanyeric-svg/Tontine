@@ -92,7 +92,7 @@
             <div class="card bg-primary text-white border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title opacity-75 small">💰 MONTANT</h5>
-                    <h2 class="fw-bold">@Model.MontantParVersement.ToString("N0")</h2>
+                    <h2 class="fw-bold">@Model.MontantParVersement.ToString("N0").Replace(","," ") Ar</h2>
                     <small>Ar / versement</small>
                 </div>
             </div>
@@ -110,7 +110,7 @@
             <div class="card bg-info text-white border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title opacity-75 small">💵 MON TOTAL</h5>
-                    <h2 class="fw-bold">@membreActuel?.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0")</h2>
+                    <h2 class="fw-bold">@membreActuel?.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0").Replace(","," ") Ar</h2>
                     <small>Ar validés</small>
                 </div>
             </div>
@@ -165,7 +165,7 @@
                                     </td>
                                     <td>@membre.Telephone</td>
                                     <td class="text-center">@membre.Versements.Count(v => v.Statut == "Confirmé") ✅</td>
-                                    <td class="text-end pe-3 fw-bold text-success">@membre.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0") Ar</td>
+                                    <td class="text-end pe-3 fw-bold text-success">@membre.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0").Replace(","," ") Ar</td>
                                 </tr>
                             }
                         </tbody>
@@ -201,7 +201,7 @@
                             @foreach (var v in mesEnvois)
                             {
                                 <tr class="@(v.Statut == "Rejeté" ? "table-danger" : "")">
-                                    <td class="ps-3 fw-bold">@v.Montant.ToString("N0") Ar</td>
+                                    <td class="ps-3 fw-bold">@v.Montant.ToString("N0").Replace(","," ") Ar</td>
                                     <td class="small">@v.Date.ToString("dd/MM/yy HH:mm")</td>
                                     <td class="text-center">
                                         @if (!string.IsNullOrEmpty(v.PreuveImage)) {
@@ -247,7 +247,7 @@
                             @foreach (var v in mesConfirmes)
                             {
                                 <tr>
-                                    <td class="ps-3 fw-bold text-success">@v.Montant.ToString("N0") Ar</td>
+                                    <td class="ps-3 fw-bold text-success">@v.Montant.ToString("N0").Replace(","," ") Ar</td>
                                     <td>@v.Date.ToString("dd/MM/yyyy HH:mm")</td>
                                     <td class="text-end pe-3">
                                         @if (!string.IsNullOrEmpty(v.PreuveImage)) {

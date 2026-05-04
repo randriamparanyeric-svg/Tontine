@@ -108,7 +108,7 @@
             <div class="card border-0 shadow-sm bg-primary text-white h-100">
                 <div class="card-body">
                     <h6 class="text-uppercase opacity-75 small fw-bold">💰 Montant Unitaire</h6>
-                    <h3 class="mb-0">@Model.MontantParVersement.ToString("N0") <small class="fs-6">Ar</small></h3>
+                    <h3 class="mb-0">@Model.MontantParVersement.ToString("N0").Replace(","," ")<small class="fs-6">Ar</small></h3>
                 </div>
             </div>
         </div>
@@ -124,7 +124,7 @@
             <div class="card border-0 shadow-sm bg-info text-white h-100">
                 <div class="card-body">
                     <h6 class="text-uppercase opacity-75 small fw-bold">💵 Total Collecté</h6>
-                    <h3 class="mb-0">@Model.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0") <small class="fs-6">Ar</small></h3>
+                    <h3 class="mb-0">@Model.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0").Replace(","," ")<small class="fs-6">Ar</small></h3>
                 </div>
             </div>
         </div>
@@ -132,7 +132,7 @@
             <div class="card border-0 shadow-sm bg-warning text-white h-100">
                 <div class="card-body">
                     <h6 class="text-uppercase opacity-75 small fw-bold">⏳ En Attente</h6>
-                    <h3 class="mb-0">@Model.Versements.Where(v => v.Statut == "En attente").Sum(v => v.Montant).ToString("N0") <small class="fs-6">Ar</small></h3>
+                    <h3 class="mb-0">@Model.Versements.Where(v => v.Statut == "En attente").Sum(v => v.Montant).ToString("N0").Replace(","," ")<small class="fs-6">Ar</small></h3>
                 </div>
             </div>
         </div>
@@ -182,7 +182,7 @@
                             {
                                 <tr>
                                     <td><strong>@v.Membre?.Nom</strong></td>
-                                    <td class="fw-bold text-success">@v.Montant.ToString("N0") Ar</td>
+                                    <td class="fw-bold text-success">@v.Montant.ToString("N0").Replace(","," ") Ar</td>
                                     <td><span class="badge bg-light text-dark border">@v.ModePaiement</span></td>
                                     <td>
                                         @if (!string.IsNullOrEmpty(v.PreuveImage))
@@ -250,7 +250,7 @@
                                     <td class="fw-bold">@membre.Nom</td>
                                     <td>@membre.Telephone</td>
                                     <td class="text-center"><span class="badge bg-secondary rounded-pill">@membre.Versements.Count</span></td>
-                                    <td class="fw-bold">@membre.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0") Ar</td>
+                                    <td class="fw-bold">@membre.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0").Replace(","," ") Ar</td>
                                     <td class="text-end">
                                         <a asp-controller="Membres" asp-action="Edit" asp-route-id="@membre.Id" class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-pencil-square fs-5"></i>

@@ -19,7 +19,7 @@
 
                             <div class="mb-3">
                                 <p><strong>👤 Admin:</strong> @groupe.NomAdmin</p>
-                                <p><strong>💰 Montant:</strong> @groupe.MontantParVersement.ToString("N0") Ar</p>
+                                <p><strong>💰 Montant:</strong> @groupe.MontantParVersement.ToString("N0").Replace(",", " ") Ar</p>
                                 <p><strong>👥 Membres:</strong> @groupe.Membres.Count / @groupe.NombreMembresPrevu</p>
                                 <p><strong>📅 Créée:</strong> @groupe.DateCreation.ToString("dd/MM/yyyy")</p>
                             </div>

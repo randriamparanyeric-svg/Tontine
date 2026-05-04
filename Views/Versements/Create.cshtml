@@ -19,7 +19,7 @@
             <div class="row">
                 <div class="col-md-4"><strong>👤 Membre:</strong> @Model.Membre?.Nom</div>
                 <div class="col-md-4"><strong>👥 Groupe:</strong> @Model.Membre?.Groupe?.Nom</div>
-                <div class="col-md-4"><strong>💰 Montant prévu:</strong> @Model.Membre?.Groupe?.MontantParVersement.ToString("N0") Ar</div>
+                <div class="col-md-4"><strong>💰 Montant prévu:</strong> @Model.Membre?.Groupe?.MontantParVersement.ToString("N0").Replace(",", " ") Ar</div>
             </div>
         </div>
 
@@ -29,9 +29,16 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label asp-for="Montant" class="form-label fw-bold">💰 Montant du versement (Ar)</label>
-                <input asp-for="Montant" type="number" step="1000" class="form-control form-control-lg border-primary" placeholder="Entrez le montant">
+                
+                @* Champ visuel pour la saisie avec espaces *@
+                <input type="text" id="MontantVisuel" class="form-control form-control-lg border-primary" placeholder="Entrez le montant">
+                
+                @* Champ réel caché pour le serveur (chiffre pur) *@
+                <input type="hidden" asp-for="Montant" id="MontantReel" 
+                       value="@(Model.Montant > 0 ? Model.Montant : (Model.Membre?.Groupe?.MontantParVersement ?? 0))">
+                
                 <span asp-validation-for="Montant" class="text-danger"></span>
-                <small class="text-muted">Recommandé : @Model.Membre?.Groupe?.MontantParVersement.ToString("N0") Ar</small>
+                <small class="text-muted">Recommandé : @Model.Membre?.Groupe?.MontantParVersement.ToString("N0").Replace(",", " ") Ar</small>
             </div>
 
             <div class="col-md-6 mb-3">
@@ -77,28 +84,61 @@
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const selectMode = document.getElementById('selectMode');
-            const sectionPreuve = document.getElementById('sectionPreuve');
-            const inputPreuve = document.getElementById('inputPreuve');
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputVisuel = document.getElementById('MontantVisuel');
+        const inputReel = document.getElementById('MontantReel');
 
+        // FONCTION DE FORMATAGE CORRIGÉE
+        function rafraichirAffichage(valeurBrute) {
+            if (!valeurBrute) return "";
+
+            // 1. On transforme en texte et on enlève tout ce qui est après la virgule ou le point
+            // Cela transforme "10000,0" ou "10000.0" en "10000"
+            let chaine = valeurBrute.toString().split(',')[0].split('.')[0];
+
+            // 2. On ne garde que les chiffres au cas où
+            let propre = chaine.replace(/\D/g, '');
+
+            if (propre === "") return "";
+
+            // 3. On affiche avec les espaces
+            return new Intl.NumberFormat('fr-FR').format(propre);
+        }
+
+        // INITIALISATION
+        if (inputReel && inputReel.value) {
+            // On nettoie la valeur réelle pour être sûr qu'elle ne contient pas de décimales pour C#
+            let valeurNettoyee = inputReel.value.toString().split(',')[0].split('.')[0].replace(/\D/g, '');
+            inputReel.value = valeurNettoyee; 
+            
+            inputVisuel.value = rafraichirAffichage(valeurNettoyee);
+        }
+
+        // SAISIE
+        inputVisuel.addEventListener('input', function (e) {
+            let brute = e.target.value.replace(/\D/g, '');
+            inputReel.value = brute; 
+            e.target.value = rafraichirAffichage(brute);
+        });
+
+        // --- Garder votre code pour le mode de paiement ici ---
+        const selectMode = document.getElementById('selectMode');
+        const sectionPreuve = document.getElementById('sectionPreuve');
+        const inputPreuve = document.getElementById('inputPreuve');
+        if(selectMode) {
             selectMode.addEventListener('change', function () {
-                const mode = this.value;
                 const modesDigitaux = ['Mvola', 'Orange Money', 'Airtel Money'];
-
-                if (modesDigitaux.includes(mode)) {
-                    // Afficher le champ image et le rendre obligatoire
+                if (modesDigitaux.includes(this.value)) {
                     sectionPreuve.style.display = 'block';
                     inputPreuve.setAttribute('required', 'required');
-                    sectionPreuve.classList.add('animate__animated', 'animate__fadeIn');
                 } else {
-                    // Masquer le champ image et retirer l'obligation
                     sectionPreuve.style.display = 'none';
                     inputPreuve.removeAttribute('required');
                     inputPreuve.value = ""; 
                 }
             });
-        });
-    </script>
+        }
+    });
+</script>
 }

@@ -24,15 +24,19 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group mb-3">
-                            <label asp-for="MontantParVersement" class="form-label fw-bold">💰 Montant / Versement (Ar)</label>
-                            <input asp-for="MontantParVersement" type="number" step="1000" class="form-control" placeholder="50000">
-                            <span asp-validation-for="MontantParVersement" class="text-danger"></span>
-                        </div>
+    <label asp-for="MontantParVersement" class="form-label fw-bold">💰 Montant / Versement (Ar)</label>
+    
+    <input type="text" id="MontantVisuel" class="form-control" placeholder="Ex: 50 000">
+    
+    <input type="hidden" asp-for="MontantParVersement" id="MontantReel">
+    
+    <span asp-validation-for="MontantParVersement" class="text-danger"></span>
+</div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label asp-for="NombreMembresPrevu" class="form-label fw-bold">👥 Nombre de Membres</label>
-                            <input asp-for="NombreMembresPrevu" type="number" class="form-control" placeholder="10">
+                            <input asp-for="NombreMembresPrevu" type="number" class="form-control" placeholder="Ex:10">
                             <span asp-validation-for="NombreMembresPrevu" class="text-danger"></span>
                         </div>
                     </div>
@@ -86,3 +90,30 @@
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
+<script>
+    const inputVisuel = document.getElementById('MontantVisuel');
+    const inputReel = document.getElementById('MontantReel');
+
+    inputVisuel.addEventListener('input', function (e) {
+        // 1. On récupère la valeur saisie en ne gardant que les chiffres
+        let valeur = e.target.value.replace(/\D/g, '');
+
+        // 2. On met à jour le champ caché (celui qui sera envoyé au serveur)
+        inputReel.value = valeur;
+
+        // 3. On reformate l'affichage pour l'utilisateur avec des espaces
+        if (valeur !== "") {
+            // Formate le nombre avec des espaces (ex: 1 000 000)
+            e.target.value = new Intl.NumberFormat('fr-FR').format(valeur);
+        } else {
+            e.target.value = "";
+        }
+    });
+
+    // Optionnel : Au chargement de la page, si le champ a déjà une valeur (ex: en édition)
+    window.addEventListener('DOMContentLoaded', (event) => {
+        if (inputReel.value) {
+            inputVisuel.value = new Intl.NumberFormat('fr-FR').format(inputReel.value);
+        }
+    });
+</script>
