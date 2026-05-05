@@ -17,7 +17,7 @@
 
                         <div class="form-group mb-3">
                             <label for="telephone" class="form-label">📱 Votre Numéro de Téléphone</label>
-                            <input type="tel" name="telephone" id="telephone" class="form-control" placeholder="+261 34 12 34 567" required autofocus>
+                            <input type="tel" name="telephone" id="telephone" class="form-control" placeholder="Ex:0341234567" required autofocus>
                             @if (ViewData.ModelState["telephone"]?.Errors.Any() == true)
                             {
                                 <span class="text-danger small">
