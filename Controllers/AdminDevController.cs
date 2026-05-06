@@ -168,23 +168,50 @@ messageBody = $@"
             HttpContext.Session.Clear();
             return RedirectToAction(nameof(Login));
         }
-      [HttpPost]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteGroupe(int id, string passwordConfirm)
+        {
+            // 1. Vérification du mot de passe (Remplacez "VotreMotDePasse" par votre logique)
+            if (passwordConfirm != "819600")
+            {
+                TempData["ErrorMessage"] = "❌ Mot de passe incorrect. Suppression annulée.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            var groupe = await _context.Groupes.FindAsync(id);
+            if (groupe != null)
+            {
+                _context.Groupes.Remove(groupe);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "✅ La tontine a été supprimée définitivement.";
+            }
+
+            return RedirectToAction(nameof(Dashboard));
+        }
+// 🔄 Action pour renouveler la tontine (Réinitialise la date de création)
+// 🔄 Action pour renouveler la tontine avec vérification de mot de passe
+[HttpPost]
 [ValidateAntiForgeryToken]
-public async Task<IActionResult> DeleteGroupe(int id, string passwordConfirm)
+public async Task<IActionResult> RenewDate(int id, string passwordRenew)
 {
-    // 1. Vérification du mot de passe (Remplacez "VotreMotDePasse" par votre logique)
-    if (passwordConfirm != "819600") 
+    if (HttpContext.Session.GetString("IsAdminDev") != "true") return Unauthorized();
+
+    // Vérification du mot de passe
+    if (passwordRenew != "819600") 
     {
-        TempData["ErrorMessage"] = "❌ Mot de passe incorrect. Suppression annulée.";
+        TempData["ErrorMessage"] = "❌ Mot de passe incorrect. Renouvellement annulé.";
         return RedirectToAction(nameof(Dashboard));
     }
 
     var groupe = await _context.Groupes.FindAsync(id);
     if (groupe != null)
     {
-        _context.Groupes.Remove(groupe);
+        groupe.DateCreation = DateTime.Now; 
+        _context.Update(groupe);
         await _context.SaveChangesAsync();
-        TempData["SuccessMessage"] = "✅ La tontine a été supprimée définitivement.";
+
+        TempData["SuccessMessage"] = $"🔄 La tontine '{groupe.Nom}' a été renouvelée avec succès à la date d'aujourd'hui.";
     }
 
     return RedirectToAction(nameof(Dashboard));

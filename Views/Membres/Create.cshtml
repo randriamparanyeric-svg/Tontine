@@ -10,9 +10,11 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form asp-action="Create">
+                    @* IMPORTANT : Ajout de enctype="multipart/form-data" pour la gestion des photos *@
+                    <form asp-action="Create" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
+                        @* --- NOM COMPLET --- *@
                         <div class="form-group mb-3">
                             <label asp-for="Nom" class="form-label fw-bold">Nom complet</label>
                             <div class="input-group">
@@ -22,6 +24,7 @@
                             <span asp-validation-for="Nom" class="text-danger small"></span>
                         </div>
 
+                        @* --- EMAIL --- *@
                         <div class="form-group mb-3">
                             <label asp-for="Email" class="form-label fw-bold">Adresse Email</label>
                             <div class="input-group">
@@ -32,6 +35,7 @@
                             <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
 
+                        @* --- TÉLÉPHONE --- *@
                         <div class="form-group mb-3">
                             <label asp-for="Telephone" class="form-label fw-bold">Téléphone</label>
                             <div class="input-group">
@@ -41,6 +45,22 @@
                             <span asp-validation-for="Telephone" class="text-danger small"></span>
                         </div>
 
+                        @* --- PHOTOS CIN (RECTO / VERSO) --- *@
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold">CIN Recto <span class="text-muted small fw-normal">(Optionnel)</span></label>
+                                <input type="file" name="cinRectoFile" class="form-control form-control-sm" accept="image/*" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold">CIN Verso <span class="text-muted small fw-normal">(Optionnel)</span></label>
+                                <input type="file" name="cinVersoFile" class="form-control form-control-sm" accept="image/*" />
+                            </div>
+                            <div class="col-12 mt-1">
+                                <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Formats acceptés : JPG, PNG.</small>
+                            </div>
+                        </div>
+
+                        @* --- CHOIX DU GROUPE --- *@
                         <div class="form-group mb-4">
                             <label asp-for="GroupeId" class="form-label fw-bold">Attribuer à un Groupe</label>
                             <div class="input-group">

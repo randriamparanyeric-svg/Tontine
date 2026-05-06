@@ -10,6 +10,8 @@ namespace Tontine.Data
         public DbSet<Groupe> Groupes { get; set; }
         public DbSet<Membre> Membres { get; set; }
         public DbSet<Versement> Versements { get; set; }
+        // Ajout de la table des retraits
+        public DbSet<Retrait> Retraits { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +36,14 @@ namespace Tontine.Data
                 .HasOne(v => v.Groupe)
                 .WithMany(g => g.Versements)
                 .HasForeignKey(v => v.GroupeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // --- NOUVELLE RELATION ---
+            // Membre -> Retraits (1 à many)
+            modelBuilder.Entity<Retrait>()
+                .HasOne(r => r.Membre)
+                .WithMany(m => m.Retraits)
+                .HasForeignKey(r => r.MembreId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

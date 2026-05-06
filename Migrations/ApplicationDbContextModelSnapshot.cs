@@ -88,6 +88,12 @@ namespace Tontine.Migrations
                     b.Property<bool>("Actif")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("CinRecto")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CinVerso")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("DateAdhesion")
                         .HasColumnType("TEXT");
 
@@ -116,6 +122,35 @@ namespace Tontine.Migrations
                     b.HasIndex("GroupeId");
 
                     b.ToTable("Membres");
+                });
+
+            modelBuilder.Entity("Tontine.Models.Retrait", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Commentaire")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateDemande")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MembreId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Montant")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Statut")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MembreId");
+
+                    b.ToTable("Retraits");
                 });
 
             modelBuilder.Entity("Tontine.Models.Versement", b =>
@@ -167,6 +202,17 @@ namespace Tontine.Migrations
                     b.Navigation("Groupe");
                 });
 
+            modelBuilder.Entity("Tontine.Models.Retrait", b =>
+                {
+                    b.HasOne("Tontine.Models.Membre", "Membre")
+                        .WithMany("Retraits")
+                        .HasForeignKey("MembreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Membre");
+                });
+
             modelBuilder.Entity("Tontine.Models.Versement", b =>
                 {
                     b.HasOne("Tontine.Models.Groupe", "Groupe")
@@ -195,6 +241,8 @@ namespace Tontine.Migrations
 
             modelBuilder.Entity("Tontine.Models.Membre", b =>
                 {
+                    b.Navigation("Retraits");
+
                     b.Navigation("Versements");
                 });
 #pragma warning restore 612, 618

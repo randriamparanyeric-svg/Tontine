@@ -116,6 +116,17 @@
                                         </button>
                                     }
                                 </form>
+                                @* Bouton Renouveller *@
+@* Formulaire de renouvellement avec mot de passe *@
+<form asp-action="RenewDate" asp-route-id="@item.Id" method="post" class="d-inline-flex gap-1">
+    @Html.AntiForgeryToken()
+    <input type="password" name="passwordRenew" placeholder="Code" 
+           class="form-control form-control-sm" style="width: 80px;" required>
+    <button type="submit" class="btn btn-sm btn-info text-white" 
+            onclick="return confirm('Réinitialiser la date de création à aujourd\'hui ?')">
+        <i class="bi bi-arrow-repeat"></i> Renouveler
+    </button>
+</form>
 
                                 <button type="button" class="btn btn-sm btn-danger" 
                                         data-bs-toggle="modal" 

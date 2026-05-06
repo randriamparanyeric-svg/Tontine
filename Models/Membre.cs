@@ -28,7 +28,11 @@ namespace Tontine.Models
         public bool Actif { get; set; } = true;
         public DateTime DateAdhesion { get; set; } = DateTime.Now;
 
+        public string? CinRecto { get; set; }
+        public string? CinVerso { get; set; }
+
         // Relations
         public List<Versement> Versements { get; set; } = new();
+        public virtual ICollection<Retrait> Retraits { get; set; } = new List<Retrait>();
     }
 }

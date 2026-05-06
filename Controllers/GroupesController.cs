@@ -105,6 +105,7 @@ public async Task<IActionResult> Create(Groupe groupe)
         {
             var groupe = await _context.Groupes
                 .Include(g => g.Membres).ThenInclude(m => m.Versements)
+                .Include(g => g.Membres).ThenInclude(m => m.Retraits) // <--- AJOUTEZ CECI
                 .Include(g => g.Versements)
                 .FirstOrDefaultAsync(g => g.Id == id);
 
@@ -161,25 +162,25 @@ public async Task<IActionResult> Create(Groupe groupe)
             return RedirectToAction(nameof(VoirCommeMembe), new { codePartage = codePartage });
         }
 
-        public async Task<IActionResult> VoirCommeMembe(string codePartage)
-        {
-            var groupe = await _context.Groupes
-                .Include(g => g.Membres).ThenInclude(m => m.Versements)
-                .Include(g => g.Versements)
-                .FirstOrDefaultAsync(g => g.CodePartage == codePartage);
+       // 2. POUR LE MEMBRE (Ne pas oublier celle-ci !)
+public async Task<IActionResult> VoirCommeMembe(string codePartage)
+{
+    var groupe = await _context.Groupes
+        .Include(g => g.Membres).ThenInclude(m => m.Versements)
+        .Include(g => g.Membres).ThenInclude(m => m.Retraits) // Ajouté ici aussi !
+        .Include(g => g.Versements)
+        .FirstOrDefaultAsync(g => g.CodePartage == codePartage);
 
-            if (groupe == null) return NotFound();
+    if (groupe == null) return NotFound();
 
-            var telephoneStocke = HttpContext.Session.GetString($"membre_groupe_{groupe.Id}");
-            if (string.IsNullOrEmpty(telephoneStocke)) return RedirectToAction(nameof(IdentifierMembre), new { codePartage = codePartage });
+    var telephoneStocke = HttpContext.Session.GetString($"membre_groupe_{groupe.Id}");
+    var membre = groupe.Membres.FirstOrDefault(m => m.Telephone == telephoneStocke);
 
-            var membre = groupe.Membres.FirstOrDefault(m => m.Telephone == telephoneStocke);
-            if (membre == null) return Unauthorized();
+    if (membre == null) return Unauthorized();
 
-            ViewBag.MembreActuel = membre;
-            return View(groupe);
-        }
-
+    ViewBag.MembreActuel = membre;
+    return View(groupe);
+}
         public async Task<IActionResult> AccederMembre(string codePartage)
         {
             var groupe = await _context.Groupes.Include(g => g.Membres).FirstOrDefaultAsync(g => g.CodePartage == codePartage);

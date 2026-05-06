@@ -45,24 +45,17 @@
             </a>
         </div>
     </div>
+
 @{
-    // 1. Définir la date de début (Date de création du groupe)
     var dateDebut = Model.DateCreation; 
     var dateAujourdhui = DateTime.Now;
     var dureeTotaleMois = Model.NombreMembresPrevu;
-
-    // 2. Calculer le nombre de mois écoulés
-    // (Année * 12 + Mois) - (Année * 12 + Mois)
     var moisEcoules = ((dateAujourdhui.Year - dateDebut.Year) * 12) + dateAujourdhui.Month - dateDebut.Month;
 
-    // 3. Limiter entre 0 et le maximum pour éviter les bugs d'affichage
     if (moisEcoules < 0) moisEcoules = 0;
     var moisAffichage = moisEcoules > dureeTotaleMois ? dureeTotaleMois : moisEcoules;
-
-    // 4. Calcul du pourcentage pour la barre
     double pourcentageTemps = ((double)moisAffichage / dureeTotaleMois) * 100;
 
-    // 5. Couleur de la barre selon l'avancement
     string couleurBarre = "bg-primary";
     if (pourcentageTemps >= 100) couleurBarre = "bg-success";
 }
@@ -103,6 +96,7 @@
         </div>
     </div>
 </div>
+
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card border-0 shadow-sm bg-primary text-white h-100">
@@ -120,14 +114,29 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm bg-info text-white h-100">
-                <div class="card-body">
-                    <h6 class="text-uppercase opacity-75 small fw-bold">💵 Total Collecté</h6>
-                    <h3 class="mb-0">@Model.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0").Replace(","," ")<small class="fs-6">Ar</small></h3>
-                </div>
-            </div>
+      <div class="col-md-3">
+    <div class="card border-0 shadow-sm bg-info text-white h-100">
+        <div class="card-body">
+            <h6 class="text-uppercase opacity-75 small fw-bold">💵 Fond en Caisse</h6>
+            @{
+                // On convertit les sommes en double pour être compatible avec SQLite et éviter l'erreur CS0019
+                var totalVersements = (double)Model.Versements
+                    .Where(v => v.Statut == "Confirmé")
+                    .Sum(v => v.Montant);
+                
+                var totalRetraits = (double)Model.Membres
+                    .SelectMany(m => m.Retraits)
+                    .Where(r => r.Statut == "Confirmé")
+                    .Sum(r => r.Montant);
+                
+                // Maintenant, les deux sont des 'double', la soustraction fonctionne
+                var soldeCaisse = totalVersements - totalRetraits;
+            }
+            <h3 class="mb-0">@soldeCaisse.ToString("N0").Replace(","," ")<small class="fs-6">Ar</small></h3>
+            <small class="opacity-75">Net (Versements - Retraits)</small>
         </div>
+    </div>
+</div>
         <div class="col-md-3">
             <div class="card border-0 shadow-sm bg-warning text-white h-100">
                 <div class="card-body">
@@ -152,6 +161,7 @@
         </div>
     </div>
 
+    @* --- SECTION VERSEMENTS À VALIDER --- *@
     <div class="card border-0 shadow-sm mb-4 border-start border-warning border-4">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-bold text-dark">
@@ -222,6 +232,71 @@
         </div>
     </div>
 
+    @* --- NOUVELLE SECTION : RETRAITS À VALIDER --- *@
+    <div class="card border-0 shadow-sm mb-4 border-start border-danger border-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-dark">
+                <i class="bi bi-cash-stack me-2 text-danger"></i>Demandes de retraits
+            </h5>
+            <span class="badge bg-danger rounded-pill">
+                @{
+                    var retraitsAttente = Model.Membres.SelectMany(m => m.Retraits).Where(r => r.Statut == "En attente").ToList();
+                }
+                @retraitsAttente.Count en attente
+            </span>
+        </div>
+        <div class="card-body">
+            @if (retraitsAttente.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Membre</th>
+                                <th>Montant demandé</th>
+                                <th>Date Demande</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in retraitsAttente.OrderByDescending(x => x.DateDemande))
+                            {
+                                <tr>
+                                    <td><strong>@r.Membre?.Nom</strong><br><small class="text-muted">@r.Membre?.Telephone</small></td>
+                                    <td class="fw-bold text-danger">@r.Montant.ToString("N0").Replace(",", " ") Ar</td>
+                                    <td class="small text-muted">@r.DateDemande.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="text-end">
+                                        <div class="btn-group shadow-sm">
+                                            <form asp-action="Confirmer" asp-controller="Retraits" asp-route-id="@r.Id" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-success rounded-start" 
+                                                        onclick="return confirm('Confirmer que vous avez payé ce montant à @r.Membre?.Nom ?')">
+                                                    Valider paiement
+                                                </button>
+                                            </form>
+                                            <form asp-action="Rejeter" asp-controller="Retraits" asp-route-id="@r.Id" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-end">Refuser</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="bi bi-info-circle fs-1 text-muted"></i>
+                    <p class="text-muted mt-2">Aucune demande de retrait en attente.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* --- LISTE DES MEMBRES --- *@
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
             <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-people me-2"></i>Membres du groupe</h5>
@@ -240,7 +315,7 @@
                                 <th>Téléphone</th>
                                 <th class="text-center">Versements</th>
                                 <th>Total Cotisé</th>
-                                <th class="text-end">Action</th>
+                                <th class="text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -252,9 +327,14 @@
                                     <td class="text-center"><span class="badge bg-secondary rounded-pill">@membre.Versements.Count</span></td>
                                     <td class="fw-bold">@membre.Versements.Where(v => v.Statut == "Confirmé").Sum(v => v.Montant).ToString("N0").Replace(","," ") Ar</td>
                                     <td class="text-end">
-                                        <a asp-controller="Membres" asp-action="Edit" asp-route-id="@membre.Id" class="btn btn-sm btn-outline-secondary">
-                                            <i class="bi bi-pencil-square fs-5"></i>
-                                        </a>
+                                        <div class="d-flex justify-content-end gap-1">
+                                            <a asp-controller="Membres" asp-action="Edit" asp-route-id="@membre.Id" class="btn btn-sm btn-outline-secondary" title="Éditer">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-controller="Membres" asp-action="Delete" asp-route-id="@membre.Id" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -274,21 +354,16 @@
     <script>
         function copyLink() {
             const copyText = document.getElementById("shareLink");
-            
-            // 1. Sélection visuelle (utile pour l'utilisateur)
             copyText.select();
-            copyText.setSelectionRange(0, 99999); // Pour mobile
+            copyText.setSelectionRange(0, 99999);
 
-            // 2. Tentative avec l'API moderne
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(copyText.value).then(() => {
                     afficherAlerte();
                 }).catch(err => {
-                    // Secours si l'API échoue
                     executerCopieClassique();
                 });
             } else {
-                // Secours pour les anciens navigateurs ou HTTP non sécurisé
                 executerCopieClassique();
             }
         }

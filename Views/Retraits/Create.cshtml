@@ -1,0 +1,51 @@
+@model Tontine.Models.Retrait
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 500px;">
+        <div class="card-header bg-danger text-white py-3">
+            <h4 class="mb-0">Demander un Retrait</h4>
+            <small>Membre : @ViewBag.MembreNom</small>
+        </div>
+        <div class="card-body p-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                
+                @* ID du membre et Montant calculé envoyés de façon invisible *@
+                <input type="hidden" asp-for="MembreId" />
+                <input type="hidden" asp-for="Montant" />
+                
+                <div class="mb-4 text-center">
+                    <label class="form-label fw-bold text-muted text-uppercase small">Montant fixe du cycle</label>
+                    <div class="p-3 bg-light rounded-3 border">
+                        @* Affichage visuel du montant calculé par le contrôleur *@
+                        <h2 class="fw-bold text-danger mb-0">@Model.Montant.ToString("N0").Replace(",", " ") Ar</h2>
+                        <hr class="my-2">
+                        <p class="small text-muted mb-0">
+                            Calculé sur @Model.Membre.Groupe.NombreMembresPrevu membres 
+                            × @Model.Membre.Groupe.MontantParVersement.ToString("N0") Ar
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Commentaire" class="form-label fw-bold">Commentaire / Motif</label>
+                    <textarea asp-for="Commentaire" class="form-control" rows="2" placeholder="Ex: Retrait pour le cycle en cours..."></textarea>
+                    <span asp-validation-for="Commentaire" class="text-danger small"></span>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-danger btn-lg shadow">
+                        <i class="bi bi-send-check me-2"></i>Confirmer la demande
+                    </button>
+                    <a href="javascript:history.back()" class="btn btn-link text-muted mt-2 text-decoration-none">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -3,56 +3,117 @@
 <div class="container mt-5">
     <h1 class="mb-4">✏️ Éditer le Membre</h1>
 
-    <form asp-action="Edit" method="post" class="card p-4">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="card shadow-sm p-4">
         @Html.AntiForgeryToken()
 
         <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CinRecto" />
+        <input type="hidden" asp-for="CinVerso" />
 
         <div class="form-group mb-3">
-            <label asp-for="Nom" class="form-label">Nom</label>
+            <label asp-for="Nom" class="form-label fw-bold">Nom</label>
             <input asp-for="Nom" class="form-control" placeholder="Nom du membre">
-            <span asp-validation-for="Nom" class="text-danger"></span>
+            <span asp-validation-for="Nom" class="text-danger small"></span>
         </div>
 
-        <div class="form-group mb-3">
-            <label asp-for="Telephone" class="form-label">Téléphone</label>
-            <input asp-for="Telephone" class="form-control" placeholder="+261...">
-            <span asp-validation-for="Telephone" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="Email" class="form-label">Email (optionnel)</label>
-            <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com">
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="GroupeId" class="form-label">Groupe</label>
-            <select asp-for="GroupeId" class="form-control" 
-                    asp-items="@(new SelectList(ViewBag.Groupes, "Id", "Nom"))">
-                <option value="">-- Sélectionner un groupe --</option>
-            </select>
-            <span asp-validation-for="GroupeId" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <div class="form-check">
-                <input type="checkbox" asp-for="Actif" class="form-check-input">
-                <label class="form-check-label" asp-for="Actif">
-                    Membre Actif
-                </label>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="Telephone" class="form-label fw-bold">Téléphone</label>
+                    <input asp-for="Telephone" class="form-control" placeholder="+261...">
+                    <span asp-validation-for="Telephone" class="text-danger small"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="form-label fw-bold">Email (optionnel)</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com">
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
             </div>
         </div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">✅ Enregistrer</button>
-            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">❌ Annuler</a>
+        <hr />
+
+        @* --- SECTION CIN AVEC APERÇU DYNAMIQUE --- *@
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">CIN Recto</label>
+                <div class="mb-2 p-2 border rounded bg-light text-center" style="min-height: 140px;">
+                    @if (!string.IsNullOrEmpty(Model.CinRecto))
+                    {
+                        <img id="previewRecto" src="/uploads/cin/@Model.CinRecto" 
+                             class="img-thumbnail" style="height: 120px; object-fit: cover;" alt="Recto" />
+                    }
+                    else
+                    {
+                        <img id="previewRecto" src="" class="img-thumbnail d-none" style="height: 120px; object-fit: cover;" />
+                        <div id="placeholderRecto" class="text-muted py-4"><i class="bi bi-card-image fs-1"></i><br>Aucun fichier</div>
+                    }
+                </div>
+                <input type="file" name="cinRectoFile" id="inputRecto" class="form-control" accept="image/*" onchange="previewImage(this, 'previewRecto', 'placeholderRecto')" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">CIN Verso</label>
+                <div class="mb-2 p-2 border rounded bg-light text-center" style="min-height: 140px;">
+                    @if (!string.IsNullOrEmpty(Model.CinVerso))
+                    {
+                        <img id="previewVerso" src="/uploads/cin/@Model.CinVerso" 
+                             class="img-thumbnail" style="height: 120px; object-fit: cover;" alt="Verso" />
+                    }
+                    else
+                    {
+                        <img id="previewVerso" src="" class="img-thumbnail d-none" style="height: 120px; object-fit: cover;" />
+                        <div id="placeholderVerso" class="text-muted py-4"><i class="bi bi-card-image fs-1"></i><br>Aucun fichier</div>
+                    }
+                </div>
+                <input type="file" name="cinVersoFile" id="inputVerso" class="form-control" accept="image/*" onchange="previewImage(this, 'previewVerso', 'placeholderVerso')" />
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="form-group mb-3">
+            <label asp-for="GroupeId" class="form-label fw-bold">Groupe</label>
+            <select asp-for="GroupeId" class="form-select" asp-items="@(new SelectList(ViewBag.Groupes, "Id", "Nom"))">
+                <option value="">-- Sélectionner un groupe --</option>
+            </select>
+            <span asp-validation-for="GroupeId" class="text-danger small"></span>
+        </div>
+
+        <div class="form-group mb-4">
+            <div class="form-check form-switch">
+                <input type="checkbox" asp-for="Actif" class="form-check-input">
+                <label class="form-check-label fw-bold" asp-for="Actif">Membre Actif</label>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-2">
+            <button type="submit" class="btn btn-success px-4">✅ Enregistrer</button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary px-4">❌ Annuler</a>
         </div>
     </form>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        // Fonction pour prévisualiser l'image choisie avant l'upload
+        function previewImage(input, previewId, placeholderId) {
+            const preview = document.getElementById(previewId);
+            const placeholder = document.getElementById(placeholderId);
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    if(placeholder) placeholder.classList.add('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 }
