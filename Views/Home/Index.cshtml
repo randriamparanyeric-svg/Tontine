@@ -3,54 +3,133 @@
 }
 
 <div class="container mt-5">
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <h1 class="display-4">🎯 Bienvenue sur <strong>Tontine Smart</strong></h1>
-            <p class="lead text-muted">Gérez facilement votre tontine en ligne</p>
+    <div class="row align-items-center py-5 rounded-4 shadow-sm bg-gradient-light" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+        <div class="col-md-7 ps-lg-5">
+            <h1 class="display-3 fw-bold text-primary">🎯 Tontine <span class="text-success">Smart</span></h1>
+            <p class="lead text-dark fw-semibold">L'évolution numérique de l'épargne solidaire.</p>
+            <p class="text-muted">Gérez facilement vos groupes, sécurisez vos fonds et suivez vos gains en un clic.</p>
             
-            <div class="mt-4">
-                <a asp-controller="Groupes" asp-action="Index" class="btn btn-primary btn-lg me-2">
-                    📋 Mes Tontines
-                </a>
-                <a asp-controller="Groupes" asp-action="Create" class="btn btn-success btn-lg">
-                    ➕ Créer une Tontine
-                </a>
+            <div class="mt-4 d-flex gap-3">
+    <a asp-controller="Groupes" asp-action="Index" class="btn btn-primary btn-lg px-4 shadow-sm btn-hover-effect">
+        <i class="bi bi-list-task me-2"></i>Mes Tontines
+    </a>
+    <a asp-controller="Groupes" asp-action="Create" class="btn btn-success btn-lg px-4 shadow-sm btn-hover-effect">
+        <i class="bi bi-plus-circle me-2"></i>Créer un groupe
+    </a>
+</div>
+
+<style>
+    /* Effet de mouvement pour les boutons */
+    .btn-hover-effect {
+        transition: all 0.3s ease-in-out; /* Transition fluide */
+        position: relative;
+    }
+
+    .btn-hover-effect:hover {
+        transform: translateY(-4px) scale(1.02); /* Monte de 4px et grossit de 2% */
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important; /* Ombre portée plus marquée */
+    }
+
+    /* Effet de clic (pression) */
+    .btn-hover-effect:active {
+        transform: translateY(-1px) scale(0.98); /* Redescend et rétrécit légèrement au clic */
+    }
+</style>
+        </div>
+        <div class="col-md-5 text-center d-none d-md-block">
+            <div class="display-1 filter-drop-shadow">💰</div>
+            <div class="badge bg-white text-primary border p-3 mt-3 shadow-sm rounded-pill">
+                <i class="bi bi-shield-check me-2"></i> 100% Digitalisé
             </div>
         </div>
-        <div class="col-md-6 text-center">
-            <div class="display-1">💰</div>
+    </div>
+
+    <div class="row mt-5 pt-4">
+        <div class="col-12 text-center mb-5">
+            <h2 class="fw-bold">L'histoire de notre solidarité</h2>
+            <div class="mx-auto bg-primary rounded" style="height: 4px; width: 60px;"></div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="p-4 border-start border-4 border-warning bg-light h-100">
+                <h4 class="text-warning fw-bold"><i class="bi bi-hourglass-split me-2"></i>La Tontine d'Autrefois</h4>
+                <p class="text-muted">Depuis des générations, nos ancêtres utilisaient la tontine basée uniquement sur la parole et la confiance physique. C'était un pilier de l'économie locale, mais avec des risques de pertes, de manque de suivi et de désaccords sur les dates.</p>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="p-4 border-start border-4 border-success bg-light h-100">
+                <h4 class="text-success fw-bold"><i class="bi bi-cpu me-2"></i>La Tontine Nouvelle (Smart)</h4>
+                <p class="text-muted">Aujourd'hui, <strong>Tontine Smart</strong> conserve l'esprit de solidarité tout en éliminant les doutes. Grâce à la technologie, chaque versement est enregistré, chaque membre est notifié, et la transparence est totale pour tous les participants.</p>
+            </div>
         </div>
     </div>
 
     <hr class="my-5">
 
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-hover h-100 transition">
+                <div class="card-body py-5">
+                    <div class="display-4 text-primary mb-3">🔐</div>
+                    <h5 class="fw-bold">Sécurisé</h5>
+                    <p class="card-text text-muted">Accès restreint par mot de passe et cryptage des données sensibles.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-hover h-100 transition">
+                <div class="card-body py-5">
+                    <div class="display-4 text-success mb-3">👥</div>
+                    <h5 class="fw-bold">Collaboratif</h5>
+                    <p class="card-text text-muted">Gestion simplifiée des membres et des invitations au sein de votre cercle.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-hover h-100 transition">
+                <div class="card-body py-5">
+                    <div class="display-4 text-info mb-3">📊</div>
+                    <h5 class="fw-bold">Transparent</h5>
+                    <p class="card-text text-muted">Historique complet des versements disponible 24h/24 pour tous.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row mt-5">
-        <div class="col-md-4 mb-4">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="display-4 mb-3">🔐</div>
-                    <h5 class="card-title">Sécurisé</h5>
-                    <p class="card-text">Protégez vos tontines avec un mot de passe</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="display-4 mb-3">👥</div>
-                    <h5 class="card-title">Collaboratif</h5>
-                    <p class="card-text">Invitez facilement vos membres</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="display-4 mb-3">📊</div>
-                    <h5 class="card-title">Transparent</h5>
-                    <p class="card-text">Suivez tous les versements en temps réel</p>
+        <div class="col-12">
+            <div class="alert alert-info border-0 shadow-sm p-4">
+                <h4 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-info-square-fill me-2"></i>Fepetra momba ny fampiasana (Conditions)</h4>
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <p class="mb-1"><strong>Amin'ny fampiasana ity sehatra ity, ny mpikambana rehetra dia manaiky ireto fepetra manaraka ireto :</strong></p>
+                        <p class="fs-5 text-dark">
+                            Ny mpikambana tsirairay dia tsy maintsy mandoa ny <strong>15%</strong> amin'ny vola azony (gain) ho an'ny fitantanana ny tontine.
+                        </p>
+                        <small class="text-muted italic">Ce prélèvement de 15% assure la maintenance et la pérennité de votre plateforme Tontine Smart.</small>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="h2 fw-bold text-primary">15%</div>
+                        <div class="small fw-bold text-uppercase">Latsakemboka</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .shadow-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .shadow-hover:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .bg-gradient-light {
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .filter-drop-shadow {
+        filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+    }
+</style>

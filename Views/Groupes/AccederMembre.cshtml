@@ -2,93 +2,150 @@
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg">
-                <div class="card-body p-5">
-                    <h2 class="text-center mb-4">🎯 @Model.Nom</h2>
-                    
-                    <div class="mb-4 p-3 bg-light rounded">
-                        <p class="text-muted mb-0">@Model.Description</p>
+        <div class="col-md-9 col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-gradient-primary text-white text-center py-4 border-0">
+                    <h2 class="fw-bold mb-0">🎯 @Model.Nom</h2>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="mb-4 p-3 bg-light rounded-3 border-start border-primary border-4 shadow-sm">
+                        <p class="text-muted mb-0 font-italic">
+                            <i class="bi bi-quote me-2 text-primary"></i>@Model.Description
+                        </p>
                     </div>
 
-                    <div class="row mb-4">
+                    <div class="row mb-5 g-3">
                         <div class="col-md-6">
-                            <div class="card bg-primary text-white">
-                                <div class="card-body">
-                                    <h5>💰 Montant par Versement</h5>
-                                    <h2>@Model.MontantParVersement.ToString("N0").Replace(",", " ") <small>Ar</small></h2>
+                            <div class="card border-0 shadow-sm bg-gradient-blue text-white h-100 card-stats">
+                                <div class="card-body text-center py-4">
+                                    <div class="rounded-circle bg-white bg-opacity-25 d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                        <i class="bi bi-cash-coin fs-3"></i>
+                                    </div>
+                                    <h6 class="text-uppercase small fw-bold opacity-75">Montant par Versement</h6>
+                                    <h2 class="fw-bold mb-0">@Model.MontantParVersement.ToString("N0").Replace(",", " ") <small class="fs-6">Ar</small></h2>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card bg-success text-white">
-                                <div class="card-body">
-                                    <h5>👥 Membres</h5>
-                                    <h2>@Model.Membres.Count  <small>/ @Model.NombreMembresPrevu</small></h2>
+                            <div class="card border-0 shadow-sm bg-gradient-green text-white h-100 card-stats">
+                                <div class="card-body text-center py-4">
+                                    <div class="rounded-circle bg-white bg-opacity-25 d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                        <i class="bi bi-people-fill fs-3"></i>
+                                    </div>
+                                    <h6 class="text-uppercase small fw-bold opacity-75">Membres inscrits</h6>
+                                    <h2 class="fw-bold mb-0">@Model.Membres.Count <span class="fs-5 opacity-75">/ @Model.NombreMembresPrevu</span></h2>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2 mb-3">
-                        <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#adminModal">
-                            🔐 Accès Trésorier seulement (Mot de passe)
+                    <div class="d-grid gap-3">
+                        <button type="button" class="btn btn-dark btn-lg btn-animate py-3 shadow" data-bs-toggle="modal" data-bs-target="#adminModal">
+                            <i class="bi bi-shield-lock-fill me-2"></i> Accès Trésorier seulement
                         </button>
-                        <a asp-action="IdentifierMembre" asp-route-codePartage="@Model.CodePartage" class="btn btn-info btn-lg">
-                            👁️ Voir comme Membre
+                        
+                        <a asp-action="IdentifierMembre" asp-route-codePartage="@Model.CodePartage" class="btn btn-info btn-lg btn-animate py-3 shadow text-white fw-bold">
+                            <i class="bi bi-eye-fill me-2"></i> Voir comme Membre
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal fade" id="adminModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">🔐 Connexion Admin</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <form asp-action="VerifierAdmin" asp-route-codePartage="@Model.CodePartage" method="post">
-                    @Html.AntiForgeryToken()
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="motDePasse" class="form-label fw-bold">🔑 Mot de Passe Admin</label>
-                            <input type="password" name="motDePasse" id="motDePasse" class="form-control" placeholder="Entrez votre mot de passe" required>
-                            
-                            <div class="text-end mt-2">
-                                <a asp-action="ForgotPassword" class="text-muted small">Mot de passe oublié ?</a>
-                            </div>
-
-                            @if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)
-                            {
-                                <span class="text-danger small">
-                                    @ViewData.ModelState["motDePasse"].Errors[0].ErrorMessage
-                                </span>
-                            }
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-success">✅ Se Connecter</button>
-                    </div>
-                </form>
+<div class="modal fade" id="adminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-dark text-white border-0 py-3">
+                <h5 class="modal-title fw-bold">🔐 Connexion Administration</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <form asp-action="VerifierAdmin" asp-route-codePartage="@Model.CodePartage" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="display-6 text-dark mb-2">🔓</div>
+                        <p class="text-muted">Veuillez saisir votre code d'accès sécurisé</p>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="motDePasse" class="form-label fw-bold text-dark">🔑 Mot de Passe Admin</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-primary"></i></span>
+                            <input type="password" name="motDePasse" id="motDePasse" class="form-control border-start-0 bg-light" placeholder="••••••••" required>
+                        </div>
+                        
+                        <div class="text-end mt-2">
+                            <a asp-action="ForgotPassword" class="text-decoration-none small text-primary fw-semibold">Mot de passe oublié ?</a>
+                        </div>
+
+                        @if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)
+                        {
+                            <div class="alert alert-danger d-flex align-items-center mt-3 py-2 border-0 small">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <div>@ViewData.ModelState["motDePasse"].Errors[0].ErrorMessage</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 p-3">
+                    <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-dark px-4 rounded-pill shadow-sm">✅ Se Connecter</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
+
+<style>
+    /* Gradients Personnalisés */
+    .bg-gradient-primary { background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); }
+    .bg-gradient-blue { background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); }
+    .bg-gradient-green { background: linear-gradient(135deg, #198754 0%, #146c43 100%); }
+
+    /* Animations Stats */
+    .card-stats {
+        transition: transform 0.3s ease;
+    }
+    .card-stats:hover {
+        transform: scale(1.05);
+    }
+
+    /* Animation Boutons (Repris de votre logique) */
+    .btn-animate {
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-animate:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+        filter: brightness(1.1);
+    }
+
+    .btn-animate:active {
+        transform: translateY(-2px);
+    }
+
+    /* Style Modal Input Focus */
+    .form-control:focus {
+        box-shadow: none;
+        border-color: #4e73df;
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var myModal = document.getElementById('adminModal');
         var myInput = document.getElementById('motDePasse');
 
-        // Force le focus sur l'input quand la modal finit de s'afficher
         myModal.addEventListener('shown.bs.modal', function () {
             myInput.focus();
         });
 
-        // AUTO-OUVRIR LA MODAL SI ERREUR
         @if (ViewData.ModelState["motDePasse"]?.Errors.Any() == true)
         {
             <text>

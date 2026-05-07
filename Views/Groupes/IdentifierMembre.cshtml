@@ -2,45 +2,108 @@
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-lg">
-                <div class="card-body p-5">
-                    <h2 class="text-center mb-4">👤 Identification Membre</h2>
-                    
-                    <div class="mb-4 p-3 bg-light rounded">
-                        <h5>@Model.Nom</h5>
-                        <p class="text-muted mb-0">@Model.Description</p>
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-gradient-success text-white text-center py-4 border-0">
+                    <h2 class="fw-bold mb-0">👤 Identification</h2>
+                    <small class="opacity-75">Accès à votre espace membre</small>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="mb-4 text-center">
+                        <h4 class="fw-bold text-dark mb-1">@Model.Nom</h4>
+                        <p class="text-muted small">@Model.Description</p>
+                        <div class="border-bottom w-25 mx-auto mt-3"></div>
                     </div>
 
                     <form asp-action="VerifierMembre" asp-route-codePartage="@Model.CodePartage" method="post">
                         @Html.AntiForgeryToken()
 
-                        <div class="form-group mb-3">
-                            <label for="telephone" class="form-label">📱 Votre Numéro de Téléphone</label>
-                            <input type="tel" name="telephone" id="telephone" class="form-control" placeholder="Ex:0341234567" required autofocus>
+                        <div class="form-group mb-4">
+                            <label for="telephone" class="form-label fw-bold text-dark">
+                                <i class="bi bi-phone me-1 text-success"></i> Votre Numéro de Téléphone
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-hash text-muted"></i></span>
+                                <input type="tel" name="telephone" id="telephone" class="form-control border-start-0 ps-0 form-control-lg bg-light" placeholder="Ex: 0341234567" required autofocus>
+                            </div>
+                            
                             @if (ViewData.ModelState["telephone"]?.Errors.Any() == true)
                             {
-                                <span class="text-danger small">
+                                <div class="text-danger small mt-2 animate__animated animate__shakeX">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i>
                                     @ViewData.ModelState["telephone"].Errors[0].ErrorMessage
-                                </span>
+                                </div>
                             }
-                            <small class="form-text text-muted">Entrez le numéro de téléphone avec lequel vous avez été inscrit</small>
+                            <div class="form-text mt-2 text-center text-muted">
+                                Entrez le numéro utilisé lors de votre inscription.
+                            </div>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">✅ Confirmer</button>
-                            <a asp-action="AccederMembre" asp-route-codePartage="@Model.CodePartage" class="btn btn-secondary">🔙 Retour</a>
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-success btn-lg btn-animate shadow-sm py-3 fw-bold">
+                                ✅ Confirmer
+                            </button>
+                            <a asp-action="AccederMembre" asp-route-codePartage="@Model.CodePartage" class="btn btn-outline-secondary btn-animate shadow-sm py-2">
+                                🔙 Retour
+                            </a>
                         </div>
                     </form>
 
-                    <hr class="my-4">
+                    <hr class="my-4 opacity-25">
 
-                    <div class="alert alert-info">
-                        <strong>💡 Besoin d'aide ?</strong>
-                        <p class="mb-0">Contactez l'admin : <strong>@Model.TelephoneAdmin</strong></p>
+                    <div class="alert alert-info border-0 rounded-3 shadow-sm bg-info-light">
+                        <div class="d-flex align-items-center">
+                            <div class="fs-3 me-3 text-info"><i class="bi bi-info-circle-fill"></i></div>
+                            <div>
+                                <strong class="d-block mb-1">Besoin d'aide ?</strong>
+                                <span class="small">Contactez l'admin : <span class="fw-bold text-dark">@Model.TelephoneAdmin</span></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Gradients et Couleurs */
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #198754 0%, #2fb344 100%);
+    }
+    .bg-info-light {
+        background-color: #e7f5ff !important;
+    }
+
+    /* Animation des boutons */
+    .btn-animate {
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-animate:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .btn-animate:active {
+        transform: translateY(-1px) scale(0.98);
+    }
+
+    /* Style du champ de saisie */
+    .form-control:focus {
+        background-color: #fff;
+        border-color: #198754;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.1);
+    }
+
+    /* Optionnel : Animation de secousse en cas d'erreur */
+    @@keyframes shakeX {
+        from, to { transform: translate3d(0, 0, 0); }
+        10%, 30%, 50%, 70%, 90% { transform: translate3d(-5px, 0, 0); }
+        20%, 40%, 60%, 80% { transform: translate3d(5px, 0, 0); }
+    }
+    .animate__shakeX {
+        animation: shakeX 0.5s;
+    }
+</style>

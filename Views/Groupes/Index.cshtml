@@ -1,9 +1,14 @@
 @model IEnumerable<Tontine.Models.Groupe>
 
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>📋 Mes Tontines</h1>
-        <a asp-action="Create" class="btn btn-primary">➕ Créer une Tontine</a>
+    <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom">
+        <div>
+            <h1 class="fw-bold text-primary mb-0">📋 Mes Tontines</h1>
+            <p class="text-muted mb-0">Gérez et suivez vos groupes d'épargne active</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm btn-animate">
+            <i class="bi bi-plus-circle me-2"></i>Créer une Tontine
+        </a>
     </div>
 
     @if (Model.Any())
@@ -12,26 +17,49 @@
             @foreach (var groupe in Model)
             {
                 <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100">
+                    <div class="card h-100 border-0 shadow-sm card-hover">
+                        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-start">
+                            <h5 class="card-title fw-bold text-dark mb-0">@groupe.Nom</h5>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Actif</span>
+                        </div>
+
                         <div class="card-body">
-                            <h5 class="card-title">@groupe.Nom</h5>
-                            <p class="card-text text-muted">@groupe.Description</p>
+                            <p class="card-text text-muted small mb-4">@(string.IsNullOrEmpty(groupe.Description) ? "Aucune description fournie." : groupe.Description)</p>
 
-                            <div class="mb-3">
-                                <p><strong>👤 Admin:</strong> @groupe.NomAdmin</p>
-                                <p><strong>💰 Montant:</strong> @groupe.MontantParVersement.ToString("N0").Replace(",", " ") Ar</p>
-                                <p><strong>👥 Membres:</strong> @groupe.Membres.Count / @groupe.NombreMembresPrevu</p>
-                                <p><strong>📅 Créée:</strong> @groupe.DateCreation.ToString("dd/MM/yyyy")</p>
+                            <div class="bg-light rounded-3 p-3 mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small"><i class="bi bi-person-badge me-2 text-warning"></i>Admin:</span>
+                                    <span class="fw-semibold small">@groupe.NomAdmin</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small"><i class="bi bi-cash-stack me-2 text-success"></i>Montant:</span>
+                                    <span class="fw-bold text-success small">@groupe.MontantParVersement.ToString("N0").Replace(",", " ") Ar</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small"><i class="bi bi-people me-2 text-info"></i>Membres:</span>
+                                    <span class="fw-semibold small">@groupe.Membres.Count / @groupe.NombreMembresPrevu</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted small"><i class="bi bi-calendar3 me-2 text-danger"></i>Créée le:</span>
+                                    <span class="fw-semibold small">@groupe.DateCreation.ToString("dd/MM/yyyy")</span>
+                                </div>
                             </div>
 
-                            <div class="d-flex gap-2 flex-wrap">
-                                <a asp-action="Details" asp-route-id="@groupe.Id" class="btn btn-sm btn-info">👁️ Détails</a>
-                                <a asp-action="AccederMembre" asp-route-codePartage="@groupe.CodePartage" class="btn btn-sm btn-success">🔓 Accéder</a>
+                            <div class="d-flex gap-2">
+                                <a asp-action="Details" asp-route-id="@groupe.Id" class="btn btn-outline-info flex-grow-1 btn-animate shadow-sm">
+                                    <i class="bi bi-eye me-1"></i> Détails
+                                </a>
+                                <a asp-action="AccederMembre" asp-route-codePartage="@groupe.CodePartage" class="btn btn-success flex-grow-1 btn-animate shadow-sm">
+                                    <i class="bi bi-unlock me-1"></i> Accéder
+                                </a>
                             </div>
+                        </div>
 
-                            <small class="text-muted d-block mt-2">
-                                🔗 Code: <code>@groupe.CodePartage</code>
-                            </small>
+                        <div class="card-footer bg-transparent border-0 pb-4">
+                            <div class="d-flex align-items-center justify-content-center bg-white border rounded-pill py-1 px-3 shadow-sm">
+                                <small class="text-muted me-2"><i class="bi bi-key-fill text-secondary me-1"></i>Code:</small>
+                                <code class="text-primary fw-bold">@groupe.CodePartage</code>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -40,8 +68,49 @@
     }
     else
     {
-        <div class="alert alert-info">
-            Vous n'avez pas encore de tontine. <a asp-action="Create">Créez-en une maintenant!</a>
+        <div class="text-center py-5 shadow-sm rounded-4 bg-light border border-dashed">
+            <div class="display-1 text-muted mb-4">📥</div>
+            <h3 class="fw-bold">Aucune tontine trouvée</h3>
+            <p class="text-muted">Il semblerait que vous ne fassiez partie d'aucun groupe pour le moment.</p>
+            <a asp-action="Create" class="btn btn-primary mt-3 btn-animate">
+                Commencer maintenant
+            </a>
         </div>
     }
 </div>
+
+<style>
+    /* Effet sur les cartes */
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+    }
+
+    /* Animation des boutons */
+    .btn-animate {
+        transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-animate:hover {
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+
+    .btn-animate:active {
+        transform: translateY(-1px) scale(0.98);
+    }
+
+    /* Couleurs personnalisées */
+    .bg-primary-subtle {
+        background-color: #e7f1ff !important;
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+        border-width: 2px !important;
+    }
+</style>
