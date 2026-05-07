@@ -1,64 +1,140 @@
 @model Tontine.Models.Groupe
 
 @{
-    ViewData["Title"] = "Attente d'activation";
+    ViewData["Title"] = "Activation de votre Tontine";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5 animate__animated animate__fadeIn">
     <div class="row justify-content-center">
-        <div class="col-md-7">
-            <div class="card shadow-lg border-0" style="border-radius: 15px;">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="progress rounded-0" style="height: 6px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" style="width: 75%"></div>
+                </div>
+
                 <div class="card-body p-5 text-center">
                     <div class="mb-4">
-                        <i class="bi bi-hourglass-split text-warning" style="font-size: 4rem;"></i>
+                        <div class="display-1 text-warning pulse-animation">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
                     </div>
 
-                    <h2 class="fw-bold text-dark">Demande transmise !</h2>
+                    <h2 class="fw-bold text-dark mb-3">Presque terminé !</h2>
                     <p class="text-muted fs-5">
-                        Félicitations, votre tontine <strong>"@Model.Nom"</strong> a été créée avec succès.
+                        Félicitations, votre tontine <span class="text-primary fw-bold">"@Model.Nom"</span> a été enregistrée avec succès.
                     </p>
 
-                    <hr class="my-4">
+                    <hr class="my-4 opacity-25">
 
-                    <div class="alert alert-info border-0 shadow-sm">
-                        <h5 class="alert-heading"><i class="bi bi-info-circle-fill"></i> Statut : En attente de validation</h5>
-                        <p class="mb-0">
-                            Pour garantir la sécurité et le support technique de votre carnet de registre, 
-                            votre espace doit être activé manuellement par le développeur.
+                    <div class="alert alert-warning border-0 shadow-sm rounded-3 py-3">
+                        <h5 class="alert-heading fw-bold"><i class="bi bi-shield-lock-fill me-2"></i>Statut : En attente d'activation</h5>
+                        <p class="mb-0 small">
+                            Pour garantir la sécurité de vos données et le support technique de votre registre, 
+                            votre espace doit être validé manuellement par notre équipe technique.
                         </p>
                     </div>
 
-                    <div class="mt-4 text-start">
-                        <h6 class="fw-bold"><i class="bi bi-credit-card-2-back"></i> Comment activer votre espace ?</h6>
-                        <ol class="list-group list-group-numbered list-group-flush">
-                            <li class="list-group-item">Effectuez le règlement des frais de mise en service (ou abonnement).</li>
-                            <li class="list-group-item">
-                                Envoyez la référence du paiement ou contactez le développeur :
-                                <div class="mt-2 p-2 bg-light rounded border text-center">
-                                    <strong><i class="bi bi-whatsapp"></i> +261 32 64 572 08</strong><br/>
-                                    <strong class="small"><i class="bi bi-facebook"></i> Eric Gr</strong><br/>       
-                                    <strong><i class="bi bi-phone-fill"></i> +261 34 64 474 61 (M-Vola : Makalahiarison)</strong>
+                    <div class="mt-5 text-start">
+                        <h6 class="fw-bold text-dark text-center mb-4 text-uppercase letter-spacing-1">
+                            <i class="bi bi-patch-check text-primary"></i> Comment activer votre espace ?
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center p-3 bg-light rounded-3 border-start border-primary border-4">
+                                    <span class="badge bg-primary rounded-circle me-3">1</span>
+                                    <span>Effectuez le règlement des frais de mise en service ou d'abonnement.</span>
                                 </div>
-                            </li>
-                            <li class="list-group-item">Dès réception, votre accès sera débloqué en moins de 24h.</li>
-                        </ol>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="p-3 bg-light rounded-3 border-start border-primary border-4">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <span class="badge bg-primary rounded-circle me-3">2</span>
+                                        <span>Transmettez votre référence de paiement au développeur :</span>
+                                    </div>
+                                    
+                                    <div class="bg-white p-3 rounded-3 shadow-sm border text-center mx-md-4">
+                                        <div class="mb-2">
+                                            <a href="https://wa.me/261326457208" class="text-decoration-none text-dark fw-bold d-block">
+                                                <i class="bi bi-whatsapp text-success"></i> +261 32 64 572 08
+                                            </a>
+                                        </div>
+                                        <div class="mb-2 small">
+                                            <i class="bi bi-facebook text-primary"></i> <span class="fw-semibold">Eric Gr</span>
+                                        </div>
+                                        <div class="text-dark fw-bold">
+                                            <i class="bi bi-phone-vibrate text-danger"></i> +261 34 64 474 61
+                                            <br><small class="text-muted fw-normal">(M-Vola : Makalahiarison)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex align-items-center p-3 bg-light rounded-3 border-start border-primary border-4">
+                                    <span class="badge bg-primary rounded-circle me-3">3</span>
+                                    <span>Votre accès sera débloqué en moins de 24h après réception.</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mt-5">
-                        <a asp-action="Index" class="btn btn-outline-secondary px-4">
-                            <i class="bi bi-house-door"></i> Retour à l'accueil
+                    <div class="mt-5 d-flex flex-column flex-md-row gap-3 justify-content-center">
+                        <a asp-action="Index" class="btn btn-light border btn-lg px-4 btn-animate">
+                            <i class="bi bi-house-door"></i> Accueil
                         </a>
-                        <button onclick="window.location.reload();" class="btn btn-primary px-4 shadow">
+                        <button onclick="window.location.reload();" class="btn btn-primary btn-lg px-4 shadow btn-animate">
                             <i class="bi bi-arrow-clockwise"></i> Vérifier l'activation
                         </button>
                     </div>
                 </div>
-                <div class="card-footer bg-light text-center py-3">
-                    <small class="text-muted">ID de votre tontine : <strong>#@Model.Id</strong> (à rappeler lors du paiement)</small>
+
+                <div class="card-footer bg-dark text-white text-center py-3 border-0">
+                    <span class="opacity-75 small">ID de votre tontine :</span> 
+                    <span class="badge bg-light text-dark ms-1">#@Model.Id</span>
+                    <div class="small mt-1 opacity-50">(À mentionner lors de votre message)</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+    .letter-spacing-1 { letter-spacing: 1px; }
+    
+    .pulse-animation {
+        animation: pulse-yellow 2s infinite;
+    }
+
+    @@keyframes pulse-yellow {
+        0% { transform: scale(0.95); opacity: 0.8; }
+        70% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    .btn-animate {
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-animate:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
+    }
+
+    .card {
+        background: #ffffff;
+    }
+
+    .badge.rounded-circle {
+        width: 25px;
+        height: 25px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+</style>
