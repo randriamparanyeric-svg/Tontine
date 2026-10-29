@@ -9,32 +9,39 @@
             <p class="lead text-dark fw-semibold">L'évolution numérique de l'épargne solidaire.</p>
             <p class="text-muted">Gérez facilement vos groupes, sécurisez vos fonds et suivez vos gains en un clic.</p>
             
-            <div class="mt-4 d-flex gap-3">
-    <a asp-controller="Groupes" asp-action="Index" class="btn btn-primary btn-lg px-4 shadow-sm btn-hover-effect">
-        <i class="bi bi-list-task me-2"></i>Mes Tontines
-    </a>
-    <a asp-controller="Groupes" asp-action="Create" class="btn btn-success btn-lg px-4 shadow-sm btn-hover-effect">
-        <i class="bi bi-plus-circle me-2"></i>Créer un groupe
-    </a>
-</div>
+            <div class="mt-4 d-flex flex-wrap gap-3">
+                <a asp-controller="Groupes" asp-action="Index" class="btn btn-primary btn-lg px-4 shadow-sm btn-hover-effect">
+                    <i class="bi bi-list-task me-2"></i>Mes Tontines
+                </a>
+                <a asp-controller="Groupes" asp-action="Create" class="btn btn-success btn-lg px-4 shadow-sm btn-hover-effect">
+                    <i class="bi bi-plus-circle me-2"></i>Créer un groupe
+                </a>
+                <!-- BOUTON WHATSAPP PLACÉ À CÔTÉ AVEC LA MÊME DIMENSION -->
+                <a href="https://wa.me/261326457208?text=Bonjour,%20je%20souhaite%20avoir%20plus%20d'informations%20sur%20Tontine%20Smart" 
+                   target="_blank" 
+                   class="btn btn-success btn-lg px-4 shadow-sm btn-hover-effect border-0" 
+                   style="background-color: #25D366; color: white;">
+                    <i class="bi bi-whatsapp me-2"></i>WhatsApp
+                </a>
+            </div>
 
-<style>
-    /* Effet de mouvement pour les boutons */
-    .btn-hover-effect {
-        transition: all 0.3s ease-in-out; /* Transition fluide */
-        position: relative;
-    }
+            <style>
+                /* Effet de mouvement pour les boutons */
+                .btn-hover-effect {
+                    transition: all 0.3s ease-in-out; /* Transition fluide */
+                    position: relative;
+                }
 
-    .btn-hover-effect:hover {
-        transform: translateY(-4px) scale(1.02); /* Monte de 4px et grossit de 2% */
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important; /* Ombre portée plus marquée */
-    }
+                .btn-hover-effect:hover {
+                    transform: translateY(-4px) scale(1.02); /* Monte de 4px et grossit de 2% */
+                    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important; /* Ombre portée plus marquée */
+                }
 
-    /* Effet de clic (pression) */
-    .btn-hover-effect:active {
-        transform: translateY(-1px) scale(0.98); /* Redescend et rétrécit légèrement au clic */
-    }
-</style>
+                /* Effet de clic (pression) */
+                .btn-hover-effect:active {
+                    transform: translateY(-1px) scale(0.98); /* Redescend et rétrécit légèrement au clic */
+                }
+            </style>
         </div>
         <div class="col-md-5 text-center d-none d-md-block">
             <div class="display-1 filter-drop-shadow">💰</div>
@@ -107,8 +114,8 @@
                         </p>
                         <small class="text-muted italic">Ce prélèvement de 15% assure la maintenance et la pérennité de votre plateforme Tontine Smart.</small>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="h2 fw-bold text-primary">15%</div>
+                    <div class="col-md-4 text-center mt-3 mt-md-0">
+                        <div class="h2 fw-bold text-primary mb-0">15%</div>
                         <div class="small fw-bold text-uppercase">Latsakemboka</div>
                     </div>
                 </div>

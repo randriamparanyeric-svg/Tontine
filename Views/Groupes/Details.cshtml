@@ -49,7 +49,8 @@
 @{
     var dateDebut = Model.DateCreation; 
     var dateAujourdhui = DateTime.Now;
-    var dureeTotaleMois = Model.NombreMembresPrevu;
+    // --- DURÉE DYNAMIQUE BASÉE SUR LE NOMBRE DE MEMBRES ---
+    var dureeTotaleMois = Model.Membres.Count > 0 ? Model.Membres.Count : 1;
     var moisEcoules = ((dateAujourdhui.Year - dateDebut.Year) * 12) + dateAujourdhui.Month - dateDebut.Month;
 
     if (moisEcoules < 0) moisEcoules = 0;
@@ -110,7 +111,8 @@
             <div class="card border-0 shadow-sm bg-success text-white h-100">
                 <div class="card-body">
                     <h6 class="text-uppercase opacity-75 small fw-bold">👥 Membres</h6>
-                    <h3 class="mb-0">@Model.Membres.Count / @Model.NombreMembresPrevu</h3>
+                    @* --- AFFICHAGE DYNAMIQUE DU NOMBRE DE MEMBRES (ex: 2 / 2) --- *@
+                    <h3 class="mb-0">@Model.Membres.Count / @Model.Membres.Count</h3>
                 </div>
             </div>
         </div>
@@ -119,7 +121,6 @@
         <div class="card-body">
             <h6 class="text-uppercase opacity-75 small fw-bold">💵 Fond en Caisse</h6>
             @{
-                // On convertit les sommes en double pour être compatible avec SQLite et éviter l'erreur CS0019
                 var totalVersements = (double)Model.Versements
                     .Where(v => v.Statut == "Confirmé")
                     .Sum(v => v.Montant);
@@ -129,7 +130,6 @@
                     .Where(r => r.Statut == "Confirmé")
                     .Sum(r => r.Montant);
                 
-                // Maintenant, les deux sont des 'double', la soustraction fonctionne
                 var soldeCaisse = totalVersements - totalRetraits;
             }
             <h3 class="mb-0">@soldeCaisse.ToString("N0").Replace(","," ")<small class="fs-6">Ar</small></h3>
@@ -170,6 +170,7 @@
             <span class="badge bg-warning text-dark rounded-pill">
                 @Model.Versements.Count(v => v.Statut == "En attente") en attente
             </span>
+
         </div>
         <div class="card-body">
             @{ var pending = Model.Versements.Where(v => v.Statut == "En attente").ToList(); }
@@ -244,6 +245,7 @@
                 }
                 @retraitsAttente.Count en attente
             </span>
+
         </div>
         <div class="card-body">
             @if (retraitsAttente.Any())
@@ -308,6 +310,7 @@
                 }
                 @retraitsConfirmes.Count validé(s)
             </span>
+
         </div>
         <div class="card-body">
             @if (retraitsConfirmes.Any())

@@ -36,18 +36,19 @@
                 <small class="badge bg-light text-dark border">📱 @membreActuel?.Telephone</small>
             </p>
         </div>
-        
+
         <form asp-action="QuitterGroupe" asp-route-groupeId="@Model.Id" method="post">
             @Html.AntiForgeryToken()
             <button type="submit" class="btn btn-outline-danger shadow-sm">🚪 Quitter</button>
         </form>
     </div>
 
-    @* --- PROGRESSION --- *@
+    @* --- PROGRESSION (DYNAMIQUE) --- *@
     @{
         var dateDebut = Model.DateCreation; 
         var dateAujourdhui = DateTime.Now;
-        var dureeTotaleMois = Model.NombreMembresPrevu;
+        // La durée totale s'adapte automatiquement au nombre de membres inscrits
+        var dureeTotaleMois = Model.Membres.Count > 0 ? Model.Membres.Count : 1;
         var moisEcoules = ((dateAujourdhui.Year - dateDebut.Year) * 12) + dateAujourdhui.Month - dateDebut.Month;
 
         if (moisEcoules < 0) moisEcoules = 0;
@@ -110,8 +111,8 @@
             <div class="card bg-success text-white border-0 shadow-sm h-100">
                 <div class="card-body py-3">
                     <h5 class="card-title opacity-75 small">👥 MEMBRES</h5>
-                    <h2 class="fw-bold h5 mb-1">@Model.Membres.Count / @Model.NombreMembresPrevu</h2>
-                    <small class="x-small">Participants</small>
+                    <h2 class="fw-bold h5 mb-1">@Model.Membres.Count participants</h2>
+                    <small class="x-small">Inscrits</small>
                 </div>
             </div>
         </div>
@@ -144,7 +145,7 @@
         </div>
     </div>
 
-    @* --- ACTIONS (MODIFIÉ POUR LE RETRAIT UNIQUE) --- *@
+    @* --- ACTIONS --- *@
     <div class="card border-0 shadow-sm bg-light mb-4">
         <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
@@ -164,7 +165,7 @@
                         <i class="bi bi-lock-fill me-1"></i> Retrait déjà fait
                     </button>
                 }
-                
+
                 <a asp-controller="Versements" asp-action="Create" asp-route-membreId="@membreActuel?.Id" class="btn btn-success px-4 fw-bold shadow">
                     <i class="bi bi-plus-circle me-1"></i> Verser Maintenant
                 </a>
@@ -248,10 +249,12 @@
                         <tbody>
                             @foreach (var membre in Model.Membres)
                             {
+                                var estAdminMembre = (membre.Telephone == Model.TelephoneAdmin); // <--- Correction ici
                                 <tr class="@(membre.Id == membreActuel?.Id ? "table-info" : "")">
                                     <td class="ps-3 fw-bold">
                                         @membre.Nom
                                         @if (membre.Id == membreActuel?.Id) { <span class="badge bg-primary ms-1">Moi</span> }
+                                        @if (estAdminMembre) { <span class="badge bg-warning text-dark ms-1" style="font-size: 0.7rem;">👑 Admin</span> }
                                     </td>
                                     <td>@membre.Telephone</td>
                                     <td class="text-center">@membre.Versements.Count(v => v.Statut == "Confirmé") ✅</td>
