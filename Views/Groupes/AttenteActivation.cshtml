@@ -40,7 +40,7 @@
                         </h6>
                         
                         <div class="row g-3">
-                            <!-- ÉTAPE 1 MODIFIÉE AVEC LA PHRASE D'ESSAI -->
+                            <!-- ÉTAPE 1 : PÉRIODE D'ESSAI -->
                             <div class="col-12">
                                 <div class="d-flex align-items-center p-3 bg-light rounded-3 border-start border-primary border-4">
                                     <span class="badge bg-primary rounded-circle me-3 flex-shrink-0">1</span>
@@ -48,7 +48,7 @@
                                 </div>
                             </div>
                             
-                            <!-- ÉTAPE 2 AVEC LIENS WHATSAPP ET INFOS DE PAIEMENT -->
+                            <!-- ÉTAPE 2 : LIENS DE CONTACT AVEC LE NOM DE LA TONTINE DANS WHATSAPP -->
                             <div class="col-12">
                                 <div class="p-3 bg-light rounded-3 border-start border-primary border-4">
                                     <div class="d-flex align-items-start mb-3">
@@ -58,8 +58,8 @@
                                     
                                     <div class="bg-white p-3 rounded-3 shadow-sm border text-center mx-md-4">
                                         <div class="mb-2">
-                                            <a href="https://wa.me/261326457208?text=Bonjour,%20je%20souhaite%20avoir%20plus%20d'informations%20concernant%20l'activation%20de%20ma%20tontine%20(ID:%20#@Model.Id)" target="_blank" class="text-decoration-none text-success fw-bold d-block">
-                                                <i class="bi bi-whatsapp text-success"></i> +261 32 64 572 08 (WhatsApp)
+                                            <a href="https://wa.me/261326457208?text=@Uri.EscapeDataString("Bonjour, je souhaite avoir plus d'informations concernant l'activation de ma tontine intitulée : " + Model.Nom)" target="_blank" class="text-decoration-none text-success fw-bold d-block">
+                                            <i class="bi bi-whatsapp text-success"></i> +261 32 64 572 08 (WhatsApp)
                                             </a>
                                         </div>
                                         <div class="mb-2 small">
