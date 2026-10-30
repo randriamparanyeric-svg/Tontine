@@ -49,7 +49,8 @@
 @{
     var dateDebut = Model.DateCreation; 
     var dateAujourdhui = DateTime.Now;
-    var dureeTotaleMois = Model.NombreMembresPrevu;
+    // --- DURÉE DYNAMIQUE BASÉE SUR LE NOMBRE DE MEMBRES ---
+    var dureeTotaleMois = Model.Membres.Count > 0 ? Model.Membres.Count : 1;
     var moisEcoules = ((dateAujourdhui.Year - dateDebut.Year) * 12) + dateAujourdhui.Month - dateDebut.Month;
 
     if (moisEcoules < 0) moisEcoules = 0;
@@ -110,7 +111,8 @@
             <div class="card border-0 shadow-sm bg-success text-white h-100">
                 <div class="card-body">
                     <h6 class="text-uppercase opacity-75 small fw-bold">👥 Membres</h6>
-                    <h3 class="mb-0">@Model.Membres.Count / @Model.NombreMembresPrevu</h3>
+                    @* --- AFFICHAGE DYNAMIQUE DU NOMBRE DE MEMBRES (ex: 2 / 2) --- *@
+                    <h3 class="mb-0">@Model.Membres.Count / @Model.Membres.Count</h3>
                 </div>
             </div>
         </div>
@@ -119,7 +121,6 @@
         <div class="card-body">
             <h6 class="text-uppercase opacity-75 small fw-bold">💵 Fond en Caisse</h6>
             @{
-                // On convertit les sommes en double pour être compatible avec SQLite et éviter l'erreur CS0019
                 var totalVersements = (double)Model.Versements
                     .Where(v => v.Statut == "Confirmé")
                     .Sum(v => v.Montant);
@@ -129,7 +130,6 @@
                     .Where(r => r.Statut == "Confirmé")
                     .Sum(r => r.Montant);
                 
-                // Maintenant, les deux sont des 'double', la soustraction fonctionne
                 var soldeCaisse = totalVersements - totalRetraits;
             }
             <h3 class="mb-0">@soldeCaisse.ToString("N0").Replace(","," ")<small class="fs-6">Ar</small></h3>
@@ -170,6 +170,7 @@
             <span class="badge bg-warning text-dark rounded-pill">
                 @Model.Versements.Count(v => v.Statut == "En attente") en attente
             </span>
+
         </div>
         <div class="card-body">
             @{ var pending = Model.Versements.Where(v => v.Statut == "En attente").ToList(); }
@@ -232,7 +233,7 @@
         </div>
     </div>
 
-    @* --- NOUVELLE SECTION : RETRAITS À VALIDER --- *@
+    @* --- SECTION : RETRAITS À VALIDER --- *@
     <div class="card border-0 shadow-sm mb-4 border-start border-danger border-4">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-bold text-dark">
@@ -244,6 +245,7 @@
                 }
                 @retraitsAttente.Count en attente
             </span>
+
         </div>
         <div class="card-body">
             @if (retraitsAttente.Any())
@@ -292,6 +294,56 @@
                     <i class="bi bi-info-circle fs-1 text-muted"></i>
                     <p class="text-muted mt-2">Aucune demande de retrait en attente.</p>
                 </div>
+            }
+        </div>
+    </div>
+
+    @* --- NOUVELLE SECTION : RETRAITS CONFIRMÉS --- *@
+    <div class="card border-0 shadow-sm mb-4 border-start border-success border-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-dark">
+                <i class="bi bi-check-circle me-2 text-success"></i>Retraits Confirmés
+            </h5>
+            <span class="badge bg-success rounded-pill">
+                @{
+                    var retraitsConfirmes = Model.Membres.SelectMany(m => m.Retraits).Where(r => r.Statut == "Confirmé").ToList();
+                }
+                @retraitsConfirmes.Count validé(s)
+            </span>
+
+        </div>
+        <div class="card-body">
+            @if (retraitsConfirmes.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Membre</th>
+                                <th>Montant Payé</th>
+                                <th>Date de Validation</th>
+                                <th class="text-end">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in retraitsConfirmes.OrderByDescending(x => x.DateDemande))
+                            {
+                                <tr>
+                                    <td><strong>@r.Membre?.Nom</strong></td>
+                                    <td class="fw-bold text-primary">@r.Montant.ToString("N0").Replace(",", " ") Ar</td>
+                                    <td class="small text-muted">@(r.DateDemande.ToString("dd/MM/yyyy HH:mm"))</td>
+                                    <td class="text-end">
+                                        <span class="badge bg-success-subtle text-success border border-success">Payé</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-center text-muted py-3">Aucun retrait n'a encore été validé.</p>
             }
         </div>
     </div>

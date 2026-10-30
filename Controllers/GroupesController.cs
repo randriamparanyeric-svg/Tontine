@@ -45,22 +45,43 @@ namespace Tontine.Controllers
             return View();
         }
 
-        [HttpPost]
+    [HttpPost]
 [ValidateAntiForgeryToken]
 public async Task<IActionResult> Create(Groupe groupe)
 {
+    // On retire temporairement NombreMembresPrevu de la validation du ModelState 
+    // puisqu'il est géré automatiquement par le système
+    ModelState.Remove(nameof(groupe.NombreMembresPrevu));
+
     if (ModelState.IsValid)
     {
-        // Initialisation
+        // 1. Initialisation du groupe
         groupe.EstValideParDev = false; 
         groupe.MotDePasseHash = _passwordService.HashPassword(groupe.MotDePasseHash);
         groupe.CodePartage = _shareCodeService.GenerateShareCode();
         groupe.DateCreation = DateTime.Now;
+        
+        // La durée/nombre prévu commence à 1 (l'administrateur lui-même)
+        groupe.NombreMembresPrevu = 1; 
 
         _context.Add(groupe);
+        await _context.SaveChangesAsync(); // Sauvegarde pour générer l'Id du groupe
+
+        // 2. Création automatique de l'Admin comme premier membre
+        var adminMembre = new Membre
+        {
+            Nom = groupe.NomAdmin,
+           Telephone = groupe.TelephoneAdmin ?? string.Empty, // <--- Correction ici
+            Email = groupe.AdminEmail,
+            GroupeId = groupe.Id,
+            DateAdhesion = DateTime.Now,
+            Actif = true
+        };
+
+        _context.Membres.Add(adminMembre);
         await _context.SaveChangesAsync();
 
-        // Envoi de l'email
+        // 3. Envoi de l'email de confirmation à l'administrateur
         try 
         {
             string sujet = $"Félicitations ! Votre tontine '{groupe.Nom}' est créée";
@@ -68,6 +89,7 @@ public async Task<IActionResult> Create(Groupe groupe)
                 <div style='font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px;'>
                     <h2 style='color: #2c3e50;'>Bonjour {groupe.NomAdmin},</h2>
                     <p>Votre tontine <strong>{groupe.Nom}</strong> a bien été enregistrée sur notre plateforme.</p>
+                    <p>En tant qu'administrateur, vous avez été automatiquement enregistré comme premier membre.</p>
                     <hr/>
                     <p><strong>⚠️ Statut : En attente d'activation</strong></p>
                     <p>Pour activer définitivement votre accès, veuillez effectuer le règlement des frais de gestion via <strong>M-Vola</strong> :</p>
@@ -75,17 +97,15 @@ public async Task<IActionResult> Create(Groupe groupe)
                         <li><strong>Numéro :</strong> +261 34 64 474 61</li>
                         <li><strong>Nom :</strong> Makalahiarison</li>
                     </ul>
-                    <p>Une fois le paiement validé, vous recevrez un email de confirmation et vous pourrez inviter vos membres.</p>
+                    <p>Une fois le paiement validé, vous recevrez un email de confirmation.</p>
                     <br/>
                     <p>Besoin d'aide ? Contactez-nous sur WhatsApp : +261 32 64 572 08</p>
                 </div>";
 
-            // UTILISATION DU NOM CORRECT : EnvoyerEmailAsync
             await _emailService.EnvoyerEmailAsync(groupe.AdminEmail, sujet, messageBody);
         }
         catch (Exception ex)
         {
-            // On utilise le logger que vous avez ajouté au constructeur
             _logger.LogError(ex, "Échec de l'envoi de l'email de création pour {Email}", groupe.AdminEmail);
         }
 

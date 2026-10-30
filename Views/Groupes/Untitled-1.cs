@@ -1,0 +1,1 @@
+// Générer une méthode pour envoyer un SMS de bienvenue avec SmsService
